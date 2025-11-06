@@ -1,7 +1,18 @@
 "use client";
 import { useState } from "react";
+import { Search, PlusCircle } from "lucide-react";
 
-export default function TaskInput({ onAdd }: { onAdd: (title: string) => void }) {
+export default function TaskInput({
+  onAdd,
+  search,
+  setSearch,
+  setPage
+}: {
+  onAdd: (title: string) => void;
+  search: string;
+  setSearch: (v: string) => void;
+  setPage: (v: number) => void;
+}) {
   const [title, setTitle] = useState("");
 
   const handleAdd = () => {
@@ -11,19 +22,36 @@ export default function TaskInput({ onAdd }: { onAdd: (title: string) => void })
   };
 
   return (
-    <div className="flex gap-3 mb-4">
+    <div className="bg-white p-4 rounded-xl shadow-md flex flex-col md:flex-row items-center gap-4 border border-gray-200">
+      <div className="relative w-full md:w-1/2">
+        <Search className="absolute left-3 top-3 text-gray-400" size={18} />
+        <input
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(1);
+          }}
+          placeholder="Search tasks..."
+          className="w-full pl-10 pr-3 py-3 rounded-lg border border-gray-300 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+        />
+      </div>
+
+    <div className="flex w-full md:w-1/2 items-center gap-2">
       <input
+        placeholder="Add a new task..."
+        className="flex-1 p-3 rounded-lg border border-gray-300 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 shadow-sm"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        placeholder="Add a new task..."
-        className="flex-1 border rounded-lg px-4 py-2 shadow-sm"
       />
+
       <button
+        className="px-5 py-3 bg-green-500 text-white font-semibold rounded-lg shadow hover:bg-green-600 flex items-center gap-2"
         onClick={handleAdd}
-        className="px-5 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
       >
+        <PlusCircle size={18} />
         Add
       </button>
+    </div>
     </div>
   );
 }

@@ -96,30 +96,30 @@ export default function TasksClient() {
     return <p className="text-center mt-10 text-gray-500">Loading tasks...</p>;
 
   return (
-    <div className="max-w-xl mx-auto p-6 bg-gray-50 rounded-xl shadow-xl mt-10">
+    <div className="w-full mx-auto p-8 mt-10">
+      <div className="bg-white shadow rounded-xl p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-extrabold text-gray-900">My Tasks</h1>
+          <div className="flex items-center justify-center w-full mb-4">
+  <h1 className="text-3xl font-bold text-blue-600 underline">
+    My Todos
+  </h1>
+</div>
+
         <button
-          className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 shadow-md transition"
           onClick={() => signOut()}
+          className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
         >
           Logout
         </button>
       </div>
 
-      <input
-        value={search}
-        onChange={(e) => {
-          setSearch(e.target.value);
-          setPage(1);
-        }}
-        placeholder="Search tasks..."
-        className="w-full p-2 mb-4 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-500 shadow-sm"
-      />
-
-      <TaskInput onAdd={addTask} />
-
-      <ul className="mt-6 space-y-4">
+        <TaskInput
+          onAdd={addTask}
+          search={search}
+          setSearch={setSearch}
+          setPage={setPage}
+        />
+      <ul className="mt-4 space-y-3">
         {tasks.map((task) => (
           <TaskItem
             key={task.id}
@@ -134,24 +134,26 @@ export default function TasksClient() {
       {/* Pagination */}
       <div className="flex items-center justify-center gap-2 mt-8">
         <button
-          className="flex items-center gap-2 px-4 py-2 rounded-full border bg-white text-gray-600 hover:bg-gray-100 hover:text-black transition shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
-          disabled={page === 1}
-          onClick={() => setPage((p) => p - 1)}
+          className="px-4 py-2 rounded-full border bg-white hover:bg-gray-100 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
+          disabled={page === 1 || totalPages <= 1}
+          onClick={() => setPage(page - 1)}
         >
           ← Previous
         </button>
 
-        <span className="px-4 py-2 text-sm font-medium bg-blue-500 text-white rounded-full shadow">
-          Page {page} / {totalPages}
+        <span className="px-4 py-2 text-sm bg-blue-500 text-white rounded-full shadow">
+          Page {totalPages > 0 ? page : 0} / {totalPages}
         </span>
 
         <button
-          className="flex items-center gap-2 px-4 py-2 rounded-full border bg-white text-gray-600 hover:bg-gray-100 hover:text-black transition shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
-          disabled={page === totalPages}
-          onClick={() => setPage((p) => p + 1)}
+          className="px-4 py-2 rounded-full border bg-white hover:bg-gray-100 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
+          disabled={page === totalPages || totalPages <= 1}
+          onClick={() => setPage(page + 1)}
         >
           Next →
         </button>
+</div>
+
       </div>
     </div>
   );

@@ -10,7 +10,7 @@ export default function Page() {
   if (status === "loading") return <p>Loading...</p>;
 
   return (
-    <main className="max-w-xl mx-auto">
+    <main className="w-full mx-auto bg-blue-400">
       {session ? (
         <TasksClient />
       ) : (
