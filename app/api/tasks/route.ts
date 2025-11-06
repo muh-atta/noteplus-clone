@@ -6,10 +6,12 @@ import { Prisma } from "@prisma/client";
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { title } = await req.json();
-  if (!title || title.length > 200) return NextResponse.json({ error: "Invalid title" }, { status: 400 });
+  if (!title || title.length > 200)
+    return NextResponse.json({ error: "Invalid title" }, { status: 400 });
 
   const task = await prisma.task.create({
     data: {
@@ -35,12 +37,9 @@ export async function GET(req: NextRequest) {
   );
   const q = url.searchParams.get("q") || "";
 
-  const where: Prisma.TaskScalarWhereInput = {
+  const where = {
     userId: session.user.id,
-    title: {
-      contains: q,
-      mode: Prisma.QueryMode.insensitive,
-    },
+    title: { contains: q, mode: Prisma.QueryMode.insensitive },
   };
 
   const total = await prisma.task.count({ where });
@@ -66,11 +65,13 @@ export async function GET(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await req.json();
   const task = await prisma.task.findUnique({ where: { id } });
-  if (!task || task.userId !== session.user.id) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!task || task.userId !== session.user.id)
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   await prisma.task.delete({ where: { id } });
   return NextResponse.json({ success: true });
@@ -104,7 +105,8 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await req.json();
-  if (!id) return NextResponse.json({ error: "Task ID required" }, { status: 400 });
+  if (!id)
+    return NextResponse.json({ error: "Task ID required" }, { status: 400 });
 
   const task = await prisma.task.findUnique({ where: { id } });
   if (!task || task.userId !== session.user.id)

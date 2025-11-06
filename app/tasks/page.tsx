@@ -16,27 +16,26 @@ export default function TasksClient() {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    fetchTasks(page);
-  }, [page]);
+  const timeout = setTimeout(() => {
+    fetchTasks(page, search);
+  }, 400);
+
+  return () => clearTimeout(timeout);
+}, [page, search]);
+
 
   const fetchTasks = async (pageNumber: number, query = "") => {
-    setLoading(true);
-    const res = await fetch(
-      `/api/tasks?page=${pageNumber}&limit=${pageSize}&q=${query}`
-    );
-    const data = await res.json();
-    setTasks(data.items);
-    setTotalPages(data.totalPages);
-    setLoading(false);
-  };
+  if (tasks.length === 0) setLoading(true);
 
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      fetchTasks(page, search);
-    }, 400);
+  const res = await fetch(`/api/tasks?page=${pageNumber}&limit=${pageSize}&q=${query}`);
+  const data = await res.json();
 
-    return () => clearTimeout(timeout);
-  }, [search, page]);
+  setTasks(data.items);
+  setTotalPages(data.totalPages);
+
+  setLoading(false);
+};
+
 
   const addTask = async (title: string) => {
     if (!title.trim()) return;
