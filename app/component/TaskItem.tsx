@@ -7,10 +7,12 @@ export default function TaskItem({
   task,
   onDelete,
   onUpdate,
+  onToggle,
 }: {
   task: Task;
   onDelete: (id: string) => void;
   onUpdate: (id: string, title: string) => void;
+  onToggle: (id: string) => void;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(task.title);
@@ -22,6 +24,14 @@ export default function TaskItem({
 
   return (
     <li className="bg-white p-4 rounded-xl shadow flex justify-between">
+      <div className="space-x-4">
+        <input
+          type="checkbox"
+          checked={task.done}
+          onChange={() => onToggle(task.id)}
+          className="w-5 h-5 accent-green-600 cursor-pointer mr-3"
+        />
+      </div>
       {isEditing ? (
         <div className="flex flex-1 gap-2">
           <input

@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
   );
   const q = url.searchParams.get("q") || "";
 
-  const where: Prisma.TaskWhereInput = {
+  const where: Prisma.TaskScalarWhereInput = {
     userId: session.user.id,
     title: {
       contains: q,
@@ -93,6 +93,26 @@ export async function PUT(req: NextRequest) {
     data: {
       title: title !== undefined ? title : task.title,
     },
+  });
+
+  return NextResponse.json(updated);
+}
+
+export async function PATCH(req: NextRequest) {
+  const session = await getServerSession(authOptions);
+  if (!session)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { id } = await req.json();
+  if (!id) return NextResponse.json({ error: "Task ID required" }, { status: 400 });
+
+  const task = await prisma.task.findUnique({ where: { id } });
+  if (!task || task.userId !== session.user.id)
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+  const updated = await prisma.task.update({
+    where: { id },
+    data: { done: !task.done },
   });
 
   return NextResponse.json(updated);
