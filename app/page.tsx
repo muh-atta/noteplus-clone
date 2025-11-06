@@ -7,7 +7,7 @@ import TasksClient from "./tasks/page";
 export default function Page() {
   const { data: session, status } = useSession();
 
-  if (status === "loading") return <p>Loading...</p>;
+  if (status === "loading") return <p className="text-center justify-center">Loading...</p>;
 
   return (
     <main className="w-full mx-auto bg-blue-400">
