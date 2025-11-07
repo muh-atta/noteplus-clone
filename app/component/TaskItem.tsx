@@ -29,7 +29,7 @@ export default function TaskItem({
           type="checkbox"
           checked={task.done}
           onChange={() => onToggle(task.id)}
-          className="w-5 h-5 accent-green-600 cursor-pointer mr-3"
+          className="w-5 h-5 accent-blue-600 cursor-pointer mr-3"
         />
       </div>
       {isEditing ? (
@@ -42,7 +42,7 @@ export default function TaskItem({
           />
           <button
             onClick={handleUpdate}
-            className="px-3 py-1 bg-green-500 text-white rounded"
+            className="px-3 py-1 bg-blue-500 text-white rounded"
           >
             Save
           </button>
@@ -52,10 +52,10 @@ export default function TaskItem({
           <span className="flex-1 font-medium">{task.title}</span>
           <div className="flex gap-2">
             <button onClick={() => setIsEditing(true)}>
-              <Pencil className="w-5 h-5 text-blue-500" />
+              <Pencil className="w-5 h-5 font-extrabold text-blue-700" />
             </button>
             <button onClick={() => onDelete(task.id)}>
-              <Trash className="w-5 h-5 text-red-500" />
+              <Trash className="w-5 h-5 text-blue-700" />
             </button>
           </div>
         </>

@@ -1,19 +1,21 @@
 "use client";
-
-import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
 import TaskInput from "../component/TaskInput";
 import TaskItem from "../component/TaskItem";
 import { Task } from "../types/task";
+import Loader from "../component/Loader";
 
 export default function TasksClient() {
-  const { data: session } = useSession();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const pageSize = 5; // tasks per page
   const [search, setSearch] = useState("");
+  const [showSearchInput, setShowSearchInput] = useState(false);
+  const [showAddInput, setShowAddInput] = useState(false);
+  const [activeTab, setActiveTab] = useState<"add" | "search">("add");
+
 
   useEffect(() => {
   const timeout = setTimeout(() => {
@@ -65,12 +67,14 @@ export default function TasksClient() {
 
   const updateTask = async (id: string, title: string) => {
     if (!title.trim()) return;
+    setLoading(true);
     const res = await fetch("/api/tasks", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id, title }),
     });
     const updated = await res.json();
+    setLoading(false);
     setTasks((prev) => prev.map((t) => (t.id === id ? updated : t)));
   };
 
@@ -84,71 +88,96 @@ export default function TasksClient() {
     fetchTasks(page);
   };
 
-  if (!session)
-    return <p className="text-center mt-10 text-gray-500">Please login</p>;
-
   return (
     <div className="relative">
-
-      {/* Loader Overlay */}
-      {loading && (
-        <div className="fixed inset-0 bg-white/70 backdrop-blur-md flex items-center justify-center z-50">
-          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-        </div>
-      )}
-
-      {/* Blur content when loading */}
-      <div className={`${loading ? "blur-sm pointer-events-none" : ""} w-full mx-auto p-8 mt-10`}>
-        <div className="bg-white shadow rounded-xl p-6">
-
-          <div className="flex justify-between items-center mb-6">
-            <div className="flex items-center justify-center w-full mb-4">
-              <h1 className="text-3xl font-bold text-blue-600 underline">My Todos</h1>
-            </div>
+      {loading && <Loader />}
+      <div
+        className={`${
+          loading ? "blur-sm pointer-events-none" : ""
+        } flex items-center justify-center bg-blue-100 bg-opacity-60 backdrop-blur-sm`}
+      >
+        <div className="bg-blue-900 flex flex-col min-h-[639px] p-4 sm:p-6 shadow-xl rounded-xl w-full lg:min-w-4xl mx-auto">
+          <div className="flex gap-2 mb-4 flex-wrap justify-end">
+            <button
+              onClick={() => {
+                setShowAddInput(true);
+                setShowSearchInput(false);
+                setActiveTab("add");
+              }}
+              className={`px-4 py-2 rounded-lg transition font-medium 
+              ${
+                activeTab === "add"
+                  ? "bg-white text-blue-700 border border-blue-700 shadow-md"
+                  : "bg-blue-700 text-white hover:bg-blue-600"
+              }
+            `}
+            >
+              Add To Do
+            </button>
 
             <button
-              onClick={() => { signOut(); setLoading(true)}}
-              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+              onClick={() => {
+                setShowSearchInput(true);
+                setShowAddInput(false);
+                setActiveTab("search");
+              }}
+              className={`px-4 py-2 rounded-lg transition font-medium
+              ${
+                activeTab === "search"
+                  ? "bg-white text-blue-700 border border-blue-700 shadow-md"
+                  : "bg-blue-700 text-white hover:bg-blue-600"
+              }
+            `}
             >
-              Logout
+              Search
             </button>
           </div>
-
-          <TaskInput
-            onAdd={addTask}
-            search={search}
-            setSearch={setSearch}
-            setPage={setPage}
-          />
-
-          <ul className="mt-4 space-y-3">
-            {tasks.map((task) => (
-              <TaskItem
-                key={task.id}
-                task={task}
-                onDelete={deleteTask}
-                onUpdate={updateTask}
-                onToggle={toggleTask}
+          <div className="flex-1">
+            {showSearchInput && (
+              <TaskInput
+                mode="search"
+                search={search}
+                setSearch={setSearch}
+                setPage={setPage}
               />
-            ))}
-          </ul>
+            )}
 
-          {/* Pagination */}
-          <div className="flex items-center justify-center gap-2 mt-8">
+            {showAddInput && <TaskInput mode="add" onAdd={addTask} />}
+
+            <ul className="mt-4 space-y-3">
+              {tasks.map((task) => (
+                <TaskItem
+                  key={task.id}
+                  task={task}
+                  onDelete={deleteTask}
+                  onUpdate={updateTask}
+                  onToggle={toggleTask}
+                />
+              ))}
+
+              {/* No tasks message */}
+              {tasks.length === 0 && !loading && (
+                <p className="text-center text-white opacity-80 py-10">
+                  No tasks found.
+                </p>
+              )}
+            </ul>
+          </div>
+          <div className="flex items-center justify-center gap-2 py-6">
             <button
-              className="px-4 py-2 rounded-full border bg-white hover:bg-gray-100 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
+              className="px-4 py-2 rounded-full bg-white hover:bg-gray-100 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
               disabled={page === 1 || totalPages <= 1}
               onClick={() => setPage(page - 1)}
             >
               ← Previous
             </button>
 
-            <span className="px-4 py-2 text-sm bg-blue-500 text-white rounded-full shadow">
+            <span className="px-4 py-2 text-sm bg-blue-700 text-white rounded-full shadow">
               Page {totalPages > 0 ? page : 0} / {totalPages}
             </span>
 
             <button
-              className="px-4 py-2 rounded-full border bg-white hover:bg-gray-100 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
+              className="px-4 py-2 rounded-full bg-white hover:bg-gray-100 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
               disabled={page === totalPages || totalPages <= 1}
               onClick={() => setPage(page + 1)}
             >

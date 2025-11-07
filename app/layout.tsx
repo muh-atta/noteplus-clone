@@ -1,30 +1,20 @@
-"use client"; // Required because we use SessionProvider here
-
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+"use client";
+import Header from "./component/Header";
 import "./globals.css";
-import { SessionProvider } from "next-auth/react"; // import SessionProvider
+import { SessionProvider } from "next-auth/react";
+import Footer from "./component/Footer";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <SessionProvider>{children}</SessionProvider>
+    <html lang="en" >
+      <body className="flex flex-col min-h-screen font-poppins bg-[#f1f5ff]">
+        <SessionProvider>
+          <Header />
+          <main className="flex flex-1 flex-col items-center justify-center">
+            {children}
+          </main>
+          <Footer />
+        </SessionProvider>
       </body>
     </html>
   );
