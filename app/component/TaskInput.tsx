@@ -55,7 +55,7 @@ export default function TaskInput({
       />
 
       <button
-        className="px-5 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow hover:bg-blue-600 flex items-center gap-2"
+        className="px-5 py-3 bg-blue-900 text-white font-semibold rounded-lg shadow hover:bg-blue-600 flex items-center gap-2"
         onClick={handleAdd}
       >
         <PlusCircle size={18} />
