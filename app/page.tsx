@@ -6,8 +6,9 @@ import Loader from "./component/Loader";
 
 export default function Page() {
   const { data: session, status } = useSession();
-
   if (status === "loading") return <Loader />;
-
+  if (session) {
+    localStorage.setItem("userId", session.user?.id || "");
+  }
   return session ? <TasksClient /> : <GoogleLoginButton />;
 }

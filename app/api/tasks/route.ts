@@ -10,6 +10,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { title } = await req.json();
+  console.log("Creating task with title:", title);
   if (!title || title.length > 200)
     return NextResponse.json({ error: "Invalid title" }, { status: 400 });
 

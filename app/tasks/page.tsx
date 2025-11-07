@@ -12,26 +12,26 @@ export default function TasksClient() {
   const [totalPages, setTotalPages] = useState(1);
   const pageSize = 5; // tasks per page
   const [search, setSearch] = useState("");
-  const [showSearchInput, setShowSearchInput] = useState(false);
-  const [showAddInput, setShowAddInput] = useState(false);
-  const [activeTab, setActiveTab] = useState<"add" | "search">("add");
-
+  const userId = localStorage.getItem("userId");
+  console.log("User ID in TasksClient:", userId);
 
   useEffect(() => {
-  const timeout = setTimeout(() => {
-    fetchTasks(page, search);
-  }, 400);
-  return () => clearTimeout(timeout);
-}, [page, search]);
+    const timeout = setTimeout(() => {
+      fetchTasks(page, search);
+    }, 400);
+    return () => clearTimeout(timeout);
+  }, [page, search]);
 
   const fetchTasks = async (pageNumber: number, query = "") => {
-  setLoading(true);
-  const res = await fetch(`/api/tasks?page=${pageNumber}&limit=${pageSize}&q=${query}`);
-  const data = await res.json();
-  setTasks(data.items);
-  setTotalPages(data.totalPages);
-  setLoading(false);
-};
+    setLoading(true);
+    const res = await fetch(
+      `/api/tasks?page=${pageNumber}&limit=${pageSize}&q=${query}`
+    );
+    const data = await res.json();
+    setTasks(data.items);
+    setTotalPages(data.totalPages);
+    setLoading(false);
+  };
 
   const addTask = async (title: string) => {
     if (!title.trim()) return;
@@ -39,28 +39,26 @@ export default function TasksClient() {
     const res = await fetch("/api/tasks", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title }),
+      body: JSON.stringify({ userId, title }),
     });
     const task = await res.json();
     if (task) {
       fetchTasks(page);
-    }
-    else {
+    } else {
       alert("Failed to add task");
     }
   };
 
   const deleteTask = async (id: string) => {
     setLoading(true);
-   const res = await fetch("/api/tasks", {
+    const res = await fetch("/api/tasks", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id }),
     });
     if (res) {
       fetchTasks(page);
-    }
-    else {
+    } else {
       alert("Failed to delete task");
     }
   };
@@ -97,52 +95,14 @@ export default function TasksClient() {
         } flex items-center justify-center bg-blue-100 bg-opacity-60 backdrop-blur-sm`}
       >
         <div className="bg-blue-900 flex flex-col min-h-[639px] p-4 sm:p-6 shadow-xl rounded-xl w-full lg:min-w-4xl mx-auto">
-          <div className="flex gap-2 mb-4 flex-wrap justify-end">
-            <button
-              onClick={() => {
-                setShowAddInput(true);
-                setShowSearchInput(false);
-                setActiveTab("add");
-              }}
-              className={`px-4 py-2 rounded-lg transition font-medium 
-              ${
-                activeTab === "add"
-                  ? "bg-white text-blue-700 border border-blue-700 shadow-md"
-                  : "bg-blue-700 text-white hover:bg-blue-600"
-              }
-            `}
-            >
-              Add To Do
-            </button>
-
-            <button
-              onClick={() => {
-                setShowSearchInput(true);
-                setShowAddInput(false);
-                setActiveTab("search");
-              }}
-              className={`px-4 py-2 rounded-lg transition font-medium
-              ${
-                activeTab === "search"
-                  ? "bg-white text-blue-700 border border-blue-700 shadow-md"
-                  : "bg-blue-700 text-white hover:bg-blue-600"
-              }
-            `}
-            >
-              Search
-            </button>
-          </div>
           <div className="flex-1">
-            {showSearchInput && (
-              <TaskInput
-                mode="search"
-                search={search}
-                setSearch={setSearch}
-                setPage={setPage}
-              />
-            )}
-
-            {showAddInput && <TaskInput mode="add" onAdd={addTask} />}
+            <TaskInput
+              mode="search"
+              search={search}
+              setSearch={setSearch}
+              setPage={setPage}
+              onAdd={addTask}
+            />
 
             <ul className="mt-4 space-y-3">
               {tasks.map((task) => (
@@ -184,7 +144,6 @@ export default function TasksClient() {
               Next →
             </button>
           </div>
-
         </div>
       </div>
     </div>
