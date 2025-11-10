@@ -12,20 +12,28 @@ export default function TasksClient() {
   const [totalPages, setTotalPages] = useState(1);
   const pageSize = 5; // tasks per page
   const [search, setSearch] = useState("");
-  const userId = localStorage.getItem("userId");
-  console.log("User ID in TasksClient:", userId);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      fetchTasks(page, search);
-    }, 400);
-    return () => clearTimeout(timeout);
-  }, [page, search]);
+    const id = localStorage.getItem("userId");
+    setUserId(id);
+  }, []);
+
+  useEffect(() => {
+  if (!userId) return;
+
+  const timeout = setTimeout(() => {
+    fetchTasks(page, search);
+  }, 400);
+
+  return () => clearTimeout(timeout);
+  }, [page, search, userId]);
+
 
   const fetchTasks = async (pageNumber: number, query = "") => {
     setLoading(true);
     const res = await fetch(
-      `/api/tasks?page=${pageNumber}&limit=${pageSize}&q=${query}`
+      `/api/tasks?page=${pageNumber}&limit=${pageSize}&q=${query}&userId=${userId}`
     );
     const data = await res.json();
     setTasks(data.items);
@@ -34,7 +42,7 @@ export default function TasksClient() {
   };
 
   const addTask = async (title: string) => {
-    if (!title.trim()) return;
+    if (!title.trim() || !userId) return;
     setLoading(true);
     const res = await fetch("/api/tasks", {
       method: "POST",
@@ -50,11 +58,12 @@ export default function TasksClient() {
   };
 
   const deleteTask = async (id: string) => {
+  if (!userId) return;
     setLoading(true);
     const res = await fetch("/api/tasks", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
+      body: JSON.stringify({ id, userId }),
     });
     if (res) {
       fetchTasks(page);
@@ -64,12 +73,12 @@ export default function TasksClient() {
   };
 
   const updateTask = async (id: string, title: string) => {
-    if (!title.trim()) return;
+    if (!title.trim() || !userId) return;
     setLoading(true);
     const res = await fetch("/api/tasks", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, title }),
+      body: JSON.stringify({ id, title, userId }),
     });
     const updated = await res.json();
     setLoading(false);
@@ -77,11 +86,12 @@ export default function TasksClient() {
   };
 
   const toggleTask = async (id: string) => {
+    if (!userId) return;
     setLoading(true);
     await fetch("/api/tasks", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
+      body: JSON.stringify({ id, userId }),
     });
     fetchTasks(page);
   };
