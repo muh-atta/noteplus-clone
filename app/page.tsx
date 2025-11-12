@@ -9,6 +9,7 @@ export default function Page() {
   if (status === "loading") return <Loader />;
   if (session) {
     localStorage.setItem("userId", session.user?.id || "");
+    return <TasksClient />;
   }
-  return session ? <TasksClient /> : <GoogleLoginButton />;
+  return <GoogleLoginButton />; 
 }

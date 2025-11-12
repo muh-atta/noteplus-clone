@@ -1,20 +1,20 @@
 "use client";
 import { useState, useEffect } from "react";
-import TaskInput from "../component/TaskInput";
 import TaskItem from "../component/TaskItem";
 import { Task } from "../types/task";
 import Loader from "../component/Loader";
+import { useUI } from "../context/page";
+import AddTaskModal from "../component/AddTaskModel";
 
-export default function TasksClient({ searchTerm }: { searchTerm: string }) {
-  console.log("Search Term in TasksClient:", searchTerm);
+export default function TasksClient() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const pageSize = 10; // tasks per page
-  const [search, setSearch] = useState("");
+  const pageSize = 10;
   const [userId, setUserId] = useState<string | null>(null);
-
+  const { searchQuery, openAddModal, setOpenAddModal } = useUI();
+  const [title, setTitle] = useState("");
   useEffect(() => {
     const id = localStorage.getItem("userId");
     setUserId(id);
@@ -24,11 +24,11 @@ export default function TasksClient({ searchTerm }: { searchTerm: string }) {
     if (!userId) return;
 
     const timeout = setTimeout(() => {
-      fetchTasks(page, searchTerm);
+      fetchTasks(page, searchQuery);
     }, 400);
 
     return () => clearTimeout(timeout);
-  }, [page, searchTerm, userId]);
+  }, [page, searchQuery, userId]);
 
   const fetchTasks = async (pageNumber: number, query = "") => {
     setLoading(true);
@@ -41,8 +41,9 @@ export default function TasksClient({ searchTerm }: { searchTerm: string }) {
     setLoading(false);
   };
 
-  const addTask = async (title: string) => {
+  const addTask = async () => {
     if (!title.trim() || !userId) return;
+    setOpenAddModal(false);
     setLoading(true);
     const res = await fetch("/api/tasks", {
       method: "POST",
@@ -104,16 +105,6 @@ export default function TasksClient({ searchTerm }: { searchTerm: string }) {
           loading ? "blur-sm pointer-events-none" : ""
         } min-h-screen bg-white rounded-xl`}
       >
-        {/* <div className="mb-4">
-          <TaskInput
-            mode="search"
-            search={search}
-            setSearch={setSearch}
-            setPage={setPage}
-            onAdd={addTask}
-          />
-        </div> */}
-        {/*Table  */}
         <div className=" rounded-lg overflow-hidden bg-white px-8 py-8">
           <div className="overflow-x-auto">
             <table className="min-w-max lg:min-w-full md:min-w-full rounded-2xl">
@@ -188,6 +179,15 @@ export default function TasksClient({ searchTerm }: { searchTerm: string }) {
           </button>
         </div>
       </div>
+
+      {openAddModal && (
+        <AddTaskModal
+          title={title}
+          setTitle={setTitle}
+          onAdd={addTask}
+          onClose={() => setOpenAddModal(false)}
+        />
+      )}
     </div>
   );
 }

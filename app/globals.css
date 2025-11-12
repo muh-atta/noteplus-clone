@@ -22,3 +22,29 @@ body {
 .font-jost {
   font-family: var(--font-jost);
 }
+
+
+/* Hide scrollbar by default, show on hover */
+.custom-scroll-hide {
+  scrollbar-width: thin;       /* Firefox */
+  scrollbar-color: transparent transparent; /* Firefox */
+}
+
+.custom-scroll-hide::-webkit-scrollbar {
+  width: 6px;                  /* Width of the scrollbar */
+}
+
+.custom-scroll-hide::-webkit-scrollbar-track {
+  background: transparent;     /* Track background */
+}
+
+.custom-scroll-hide::-webkit-scrollbar-thumb {
+  background-color: transparent; /* Thumb default transparent */
+  border-radius: 3px;
+  transition: background-color 0.3s;
+}
+
+/* Show scrollbar on hover */
+.custom-scroll-hide:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(107, 114, 128, 0.5); /* Gray color when hovered */
+}
