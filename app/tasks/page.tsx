@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import TaskItem from "../component/TaskItem";
 import { Task } from "../types/task";
 import Loader from "../component/Loader";
-import { useUI } from "../context/page";
+import { useUI } from "../context/ContextPage";
 import AddTaskModal from "../component/AddTaskModel";
 
 export default function TasksClient() {

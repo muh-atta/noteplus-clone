@@ -3,7 +3,7 @@ import { useSession, signOut } from "next-auth/react";
 import { CheckSquare, LogOut, Plus, Search } from "lucide-react";
 import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
-import { useUI } from "../context/page";
+import { useUI } from "../context/ContextPage";
 
 export default function Header({ className }: { className?: string }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);

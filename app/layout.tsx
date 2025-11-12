@@ -8,7 +8,7 @@ import Footer from "./component/Footer";
 import Sidebar from "./component/Sidebar";
 import { Bars3Icon } from "@heroicons/react/24/solid";
 import { usePathname } from "next/navigation";
-import { UIProvider } from "./context/page";
+import { UIProvider } from "./context/ContextPage";
 
 const jost = Jost({
   subsets: ["latin"],
