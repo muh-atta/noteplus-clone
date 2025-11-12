@@ -3,6 +3,7 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --font-jost: "Jost", sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -13,15 +14,11 @@
 }
 
 body {
-  background:"#f1f5ff";
+  background: #f1f5ff; /* ✅ no quotes */
   color: var(--foreground);
-  font-family: var(--font-poppins);
+  font-family: var(--font-jost); /* ✅ use Jost font variable */
 }
 
-:root {
-  --font-poppins: 'Poppins', sans-serif;
-}
-
-.font-poppins {
-  font-family: var(--font-poppins);
+.font-jost {
+  font-family: var(--font-jost);
 }

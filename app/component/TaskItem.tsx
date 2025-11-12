@@ -1,114 +1,119 @@
-"use client";
-import { useState } from "react";
-import { Pencil, Trash } from "lucide-react";
+
 import { Task } from "../types/task";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck } from "@fortawesome/free-solid-svg-icons";
+import {
+  PencilIcon,
+  TrashIcon,
+  LockClosedIcon,
+  UsersIcon,
+} from "@heroicons/react/24/solid";
+import EditTaskModal from "./EditTaskModel";
+import { useState } from "react";
+
+type TaskFromImage = Task & {
+  createdBy?: string;
+  updatedAt?: string | Date;
+  sharedWith?: { type: "private" | "shared"; count: number };
+};
+
+interface TaskItemProps {
+  task: TaskFromImage;
+  onDelete: (id: string) => void;
+  onUpdate: (id: string, newTitle: string) => void;
+  onToggle: (id: string) => void;
+}
+
+const formatDate = (date: Date): string => {
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
+};
+
 export default function TaskItem({
   task,
   onDelete,
   onUpdate,
   onToggle,
-}: {
-  task: Task;
-  onDelete: (id: string) => void;
-  onUpdate: (id: string, title: string) => void;
-  onToggle: (id: string) => void;
-}) {
+}: TaskItemProps) {
+  const createdBy = task.createdBy || "Bud Wiser";
+  const updatedAt = task.updatedAt
+    ? formatDate(new Date(task.updatedAt))
+    : formatDate(new Date());
+  const sharedWith = task.sharedWith || {
+    type: Math.random() > 0.3 ? "shared" : "private",
+    count: Math.floor(Math.random() * 10),
+  };
+
   const [isEditing, setIsEditing] = useState(false);
-  const [editTitle, setEditTitle] = useState(task.title);
 
-  const handleUpdate = () => {
-    const trimmed = editTitle.trim();
-    if (!trimmed) return alert("Task cannot be empty.");
-    if (trimmed.length > 200) return alert("Task limit is 1–200 characters.");
-    onUpdate(task.id, trimmed);
-    setIsEditing(false);
-  };
-
-  const handleUpdateCancel = () => {
-    setEditTitle("");
-    setIsEditing(false);
-  };
+  const handleEdit = () => setIsEditing(true);
 
   return (
-    <li className="bg-white p-4 rounded-xl shadow flex justify-between gap-3">
-      <label className="flex items-center gap-3 cursor-pointer">
-        <input
-          type="checkbox"
-          checked={task.done}
-          onChange={() => onToggle(task.id)}
-          className="hidden peer"
-        />
+    <tr className="hover:bg-gray-50 transition-colors">
+      <td className="px-6 text-center py-11 whitespace-nowrap uppercase text-sm font-medium text-gray-900">
+        {task.title}
+      </td>
 
-        <span
-          className="
-      w-6 h-6 flex items-center justify-center rounded-md
-      border-2 border-gray-400
-      peer-checked:border-blue-500 peer-checked:bg-blue-500
-      transition-all duration-300
-    "
-        >
-          <FontAwesomeIcon
-            icon={faCheck}
-            className="
-        text-white text-sm opacity-0 
-        peer-checked:opacity-100 
-        transition-opacity duration-200
-      "
-          />
-        </span>
-      </label>
+      <td className="px-6 text-center py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+        {createdBy}
+      </td>
 
-      {isEditing ? (
-        <div className="flex flex-1 gap-2">
+      <td className="px-6 text-center py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+        {updatedAt}
+      </td>
+
+      <td className="px-6 text-center py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+        <div className="flex items-center justify-center">
+          {sharedWith.type === "private" ? (
+            <LockClosedIcon className="h-5 w-5 text-gray-400 mr-2" />
+          ) : (
+            <UsersIcon className="h-5 w-5 text-gray-400 mr-2" />
+          )}
+          <span>
+            {sharedWith.type === "private"
+              ? "Only You"
+              : `${String(sharedWith.count).padStart(2, "0")} Share`}
+          </span>
+        </div>
+      </td>
+
+      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-center">
+        <div className="flex items-center justify-center space-x-2">
           <input
-            value={editTitle}
-            autoFocus
-            onChange={(e) => setEditTitle(e.target.value)}
-            className="
-    flex-1 border-b px-2 py-1
-    focus:outline-none 
-    focus:border-blue-600
-    transition-all 
-  "
+            type="checkbox"
+            checked={task?.done}
+            onChange={() => onToggle(task.id)}
+            className="h-5 w-5 md:h-6 md:w-6 border-2 border-gray-400 rounded-md cursor-pointer 
+               appearance-none checked:bg-green-500 checked:border-green-500 
+               focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-400 transition-colors duration-200"
+            title={task.done ? "Mark incomplete" : "Mark complete"}
           />
 
           <button
-            onClick={handleUpdate}
-            className="px-3 py-1 bg-blue-700 text-white rounded"
+            onClick={handleEdit}
+            className="p-2 rounded-lg bg-green-100 text-green-700 hover:bg-green-200 transition-colors"
+            title="Edit"
           >
-            Save
+            <PencilIcon className="h-4 w-4" />
           </button>
+
           <button
-            onClick={handleUpdateCancel}
-            className="px-3 py-1 bg-blue-700 text-white rounded"
+            onClick={() => onDelete(task.id)}
+            className="p-2 rounded-lg bg-pink-100 text-pink-700 hover:bg-pink-200 transition-colors"
+            title="Delete"
           >
-            Cancel
+            <TrashIcon className="h-4 w-4" />
           </button>
         </div>
-      ) : (
-        <>
-          <div className="flex items-start gap-3 w-full">
-            {/* checkbox/icon */}
+      </td>
 
-            <span className="flex-1 text-left font-medium break-words max-w-[920px]">
-              {task.title}
-            </span>
-
-            {/* action buttons here */}
-          </div>
-
-          <div className="flex gap-2">
-            <button onClick={() => setIsEditing(true)}>
-              <Pencil className="w-5 h-5 font-extrabold text-blue-700" />
-            </button>
-            <button onClick={() => onDelete(task.id)}>
-              <Trash className="w-5 h-5 text-blue-700" />
-            </button>
-          </div>
-        </>
+      {isEditing && (
+        <EditTaskModal
+          taskTitle={task.title}
+          onUpdate={(newTitle) => onUpdate(task.id, newTitle)}
+          onClose={() => setIsEditing(false)}
+        />
       )}
-    </li>
+    </tr>
   );
 }

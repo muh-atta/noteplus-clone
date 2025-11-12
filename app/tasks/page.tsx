@@ -5,12 +5,13 @@ import TaskItem from "../component/TaskItem";
 import { Task } from "../types/task";
 import Loader from "../component/Loader";
 
-export default function TasksClient() {
+export default function TasksClient({ searchTerm }: { searchTerm: string }) {
+  console.log("Search Term in TasksClient:", searchTerm);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const pageSize = 5; // tasks per page
+  const pageSize = 10; // tasks per page
   const [search, setSearch] = useState("");
   const [userId, setUserId] = useState<string | null>(null);
 
@@ -20,15 +21,14 @@ export default function TasksClient() {
   }, []);
 
   useEffect(() => {
-  if (!userId) return;
+    if (!userId) return;
 
-  const timeout = setTimeout(() => {
-    fetchTasks(page, search);
-  }, 400);
+    const timeout = setTimeout(() => {
+      fetchTasks(page, searchTerm);
+    }, 400);
 
-  return () => clearTimeout(timeout);
-  }, [page, search, userId]);
-
+    return () => clearTimeout(timeout);
+  }, [page, searchTerm, userId]);
 
   const fetchTasks = async (pageNumber: number, query = "") => {
     setLoading(true);
@@ -58,7 +58,7 @@ export default function TasksClient() {
   };
 
   const deleteTask = async (id: string) => {
-  if (!userId) return;
+    if (!userId) return;
     setLoading(true);
     const res = await fetch("/api/tasks", {
       method: "DELETE",
@@ -97,63 +97,95 @@ export default function TasksClient() {
   };
 
   return (
-    <div className="relative">
+    <div>
       {loading && <Loader />}
       <div
         className={`${
           loading ? "blur-sm pointer-events-none" : ""
-        } flex items-center justify-center bg-blue-100 bg-opacity-60 backdrop-blur-sm`}
+        } min-h-screen bg-white rounded-xl`}
       >
-        <div className="bg-blue-900 flex flex-col min-h-[639px] p-4 sm:p-6 shadow-xl rounded-xl w-full lg:min-w-4xl mx-auto">
-          <div className="flex-1">
-            <TaskInput
-              mode="search"
-              search={search}
-              setSearch={setSearch}
-              setPage={setPage}
-              onAdd={addTask}
-            />
-
-            <ul className="mt-4 space-y-3">
-              {tasks.map((task) => (
-                <TaskItem
-                  key={task.id}
-                  task={task}
-                  onDelete={deleteTask}
-                  onUpdate={updateTask}
-                  onToggle={toggleTask}
-                />
-              ))}
-
-              {/* No tasks message */}
-              {tasks.length === 0 && !loading && (
-                <p className="text-center text-white opacity-80 py-10">
-                  No tasks found.
-                </p>
-              )}
-            </ul>
+        {/* <div className="mb-4">
+          <TaskInput
+            mode="search"
+            search={search}
+            setSearch={setSearch}
+            setPage={setPage}
+            onAdd={addTask}
+          />
+        </div> */}
+        {/*Table  */}
+        <div className=" rounded-lg overflow-hidden bg-white px-8 py-8">
+          <div className="overflow-x-auto">
+            <table className="min-w-max lg:min-w-full md:min-w-full rounded-2xl">
+              <thead className="bg-gray-800 text-white border-2 rounded-xl">
+                <tr>
+                  <th
+                    scope="col"
+                    className="px-8 py-3 **text-center** text-md font-semibold uppercase tracking-wider first:rounded-tl-xl"
+                  >
+                    Title
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 **text-center** text-md font-semibold uppercase tracking-wider"
+                  >
+                    Created By
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 **text-center** text-md font-semibold uppercase tracking-wider"
+                  >
+                    Updated
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 **text-center** text-md font-semibold uppercase tracking-wider"
+                  >
+                    Shared With
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 **text-center** text-md font-semibold uppercase tracking-wider last:rounded-tr-xl"
+                  >
+                    Action
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200 py-6">
+                {tasks.length > 0 &&
+                  tasks.map((task) => (
+                    <TaskItem
+                      key={task.id}
+                      task={task}
+                      onDelete={deleteTask}
+                      onUpdate={updateTask}
+                      onToggle={toggleTask}
+                    />
+                  ))}
+              </tbody>
+            </table>
           </div>
-          <div className="flex items-center justify-center gap-2 py-6">
-            <button
-              className="px-4 py-2 rounded-full bg-white hover:bg-gray-100 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
-              disabled={page === 1 || totalPages <= 1}
-              onClick={() => setPage(page - 1)}
-            >
-              ← Previous
-            </button>
+        </div>
+        <div className="flex items-center justify-center gap-2 py-6">
+          <button
+            className="px-4 py-2 rounded-full bg-white hover:bg-gray-100 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed border border-gray-300"
+            disabled={page === 1 || totalPages <= 1}
+            onClick={() => setPage(page - 1)}
+          >
+            ← Previous
+          </button>
 
-            <span className="px-4 py-2 text-sm bg-blue-700 text-white rounded-full shadow">
-              Page {totalPages > 0 ? page : 0} / {totalPages}
-            </span>
+          <span className="px-4 py-2 text-md font-semibold bg-gray-800 text-white rounded-full shadow">
+            Page {totalPages > 0 ? page : 0} / {totalPages}
+          </span>
 
-            <button
-              className="px-4 py-2 rounded-full bg-white hover:bg-gray-100 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
-              disabled={page === totalPages || totalPages <= 1}
-              onClick={() => setPage(page + 1)}
-            >
-              Next →
-            </button>
-          </div>
+          <button
+            className="px-4 py-2 rounded-full bg-white hover:bg-gray-100 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed border border-gray-300"
+            disabled={page === totalPages || totalPages <= 1}
+            onClick={() => setPage(page + 1)}
+          >
+            Next →
+          </button>
         </div>
       </div>
     </div>

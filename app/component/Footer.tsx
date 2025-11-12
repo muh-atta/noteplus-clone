@@ -1,20 +1,24 @@
 "use client";
 
-export default function Footer() {
+export default function Footer({ className }: { className?: string }) {
   return (
-    <footer className="bg-blue-900 text-white font-bold py-6 shadow-inner">
-      <div className="max-w-6xl mx-auto flex flex-col items-center justify-center text-center space-y-2 px-4">
-        <h2 className="text-lg font-semibold tracking-wide">Todo App</h2>
-        <p className="text-sm opacity-90">
-          &copy; 2025 Todo App — All Rights Reserved.
-        </p>
+    <footer
+      className={`bg-white text-black font-bold rounded-xl ${className}`}
+    >
+      <div className="flex flex-col md:py-6 py-3 items-center md:flex-row md:justify-between md:items-center ">
+        <div className="flex sm:flex-row gap-2 sm:gap-4 text-lg items-center text-gray-500 font-normal">
+          <a href="#" className="hover:underline ">
+            Privacy Policy
+          </a>
+          <a href="#" className="hover:underline">
+            Terms of Use
+          </a>
+        </div>
 
-        <div className="flex items-center gap-4 text-sm opacity-90">
-          <a href="#" className="hover:underline">Privacy Policy</a>
-          <span className="opacity-70">•</span>
-          <a href="#" className="hover:underline">Terms</a>
-          <span className="opacity-70">•</span>
-          <a href="#" className="hover:underline">Contact</a>
+        <div className="">
+          <p className="text-lg text-gray-500 font-normal md:text-left">
+             2025&copy; <span className=" text-black"> &nbsp;NotePlus.</span> 
+          </p>
         </div>
       </div>
     </footer>

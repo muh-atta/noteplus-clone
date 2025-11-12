@@ -44,12 +44,12 @@ export default function TaskInput({
         value={searchText}
         onChange={(e) => setSearchText(e.target.value)}
         placeholder="Search tasks..."
-        className="w-full pl-10 pr-3 py-3 rounded-lg border border-gray-300 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+        className="w-full pl-10 pr-3 py-3 rounded-lg border border-gray-300 bg-gray-50 focus:outline-none focus:ring-2 focus:border-gray-500 shadow-sm"
       />
     </div>
 
     <button
-      className="px-5 py-3 bg-blue-700 text-white font-semibold rounded-lg shadow hover:bg-blue-600 flex items-center gap-2 w-full md:w-40 justify-center"
+      className="px-5 py-3 bg-gray-800 text-white font-semibold rounded-lg shadow flex items-center gap-2 w-full md:w-40 justify-center"
       onClick={handleSearch}
     >
       <Search size={18} />
@@ -64,7 +64,7 @@ export default function TaskInput({
       <input
         placeholder="Add a new task..."
         className="w-full pl-10 pr-3 py-3 rounded-lg border border-gray-300 bg-gray-50
-        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+        focus:outline-none focus:ring-2 focus:border-gray-500 shadow-sm"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && title.trim() && handleAdd()}
@@ -72,7 +72,7 @@ export default function TaskInput({
     </div>
 
     <button
-      className="px-5 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-500 flex items-center gap-2 w-full md:w-40 justify-center"
+      className="px-5 py-3 bg-gray-800 text-white font-semibold rounded-lg shadow hover:bg-blue-500 flex items-center gap-2 w-full md:w-40 justify-center"
       onClick={handleAdd}
     >
       <PlusCircle size={18} />
