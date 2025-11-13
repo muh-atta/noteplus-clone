@@ -5,6 +5,7 @@ import { Task } from "../types/task";
 import Loader from "../component/Loader";
 import { useUI } from "../context/ContextPage";
 import AddTaskModal from "../component/AddTaskModel";
+import { useRouter } from "next/navigation";
 
 export default function TasksClient() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -16,9 +17,12 @@ export default function TasksClient() {
   const { searchQuery, openAddModal, setOpenAddModal } = useUI();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-
+  const router = useRouter();
   useEffect(() => {
     const id = localStorage.getItem("userId");
+    if (!id) {
+      router.push("/login");
+    }
     setUserId(id);
   }, []);
 
@@ -103,7 +107,7 @@ export default function TasksClient() {
     <div>
       {loading && <Loader />}
       <div className=" min-h-screen bg-white rounded-xl">
-          <div className="overflow-x-auto">
+        <div className="overflow-x-auto">
           <table className=" w-full">
             <thead className="bg-gray-800 text-white">
               <tr>
@@ -139,32 +143,32 @@ export default function TasksClient() {
                 ))
               )}
             </tbody>
-            </table>
-            </div>
+          </table>
         </div>
-        {totalPages > 1 && (
-          <div className="relative h-full bottom-0 left-0 w-full flex justify-center items-center gap-2 py-4 bg-gray-50 border-t border-gray-200 z-10">
-            <button
-              className="px-4 py-2 rounded-full bg-white hover:bg-gray-100 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed border border-gray-300"
-              disabled={page === 1}
-              onClick={() => setPage(page - 1)}
-            >
-              ← Previous
-            </button>
+      </div>
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-2 py-4 bg-gray-50 border-t border-gray-200">
+          <button
+            className="px-4 py-2 rounded-full bg-white hover:bg-gray-100 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed border border-gray-300 shrink-0"
+            disabled={page === 1}
+            onClick={() => setPage(page - 1)}
+          >
+            ← Previous
+          </button>
 
-            <span className="px-4 py-2 text-md font-semibold bg-gray-800 text-white rounded-full shadow">
-              Page {page} / {totalPages}
-            </span>
+          <span className="px-4 py-2 text-md font-semibold bg-gray-800 text-white rounded-full shadow shrink-0">
+            Page {page} / {totalPages}
+          </span>
 
-            <button
-              className="px-4 py-2 rounded-full bg-white hover:bg-gray-100 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed border border-gray-300"
-              disabled={page === totalPages}
-              onClick={() => setPage(page + 1)}
-            >
-              Next →
-            </button>
-          </div>
-        )}
+          <button
+            className="px-4 py-2 rounded-full bg-white hover:bg-gray-100 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed border border-gray-300 shrink-0"
+            disabled={page === totalPages}
+            onClick={() => setPage(page + 1)}
+          >
+            Next →
+          </button>
+        </div>
+      )}
 
       {openAddModal && (
         <AddTaskModal
