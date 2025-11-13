@@ -1,15 +1,23 @@
 "use client";
 import { useSession } from "next-auth/react";
-import GoogleLoginButton from "./login/page";
-import TasksClient from "./tasks/page";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Loader from "./component/Loader";
 
 export default function Page() {
   const { data: session, status } = useSession();
-  if (status === "loading") return <Loader />;
-  if (session) {
-    localStorage.setItem("userId", session.user?.id || "");
-    return <TasksClient />;
-  }
-  return <GoogleLoginButton />; 
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === "loading") return;
+
+    if (session) {
+      localStorage.setItem("userId", session.user?.id || "");
+      router.push("/tasks");
+    } else {
+      router.push("/login");
+    }
+  }, [session, status, router]);
+
+  return <Loader />;
 }
