@@ -20,9 +20,13 @@ export default function EditTaskModal({
 
   const handleSave = () => {
     if (title.trim() !== "" && description.trim() !== "") {
-      if (title.length > 200) {
-        alert("title cant be greater than 200 words");
-        return;
+      if (title.length > 50) {
+        alert("title cant be greater than 50 words");
+        return
+      }
+      if (description.length > 50) {
+        alert("description cant be greater than 50 words");
+        return
       }
       onUpdate(title, description);
       onClose();
