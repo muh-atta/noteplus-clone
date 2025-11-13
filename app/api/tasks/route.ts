@@ -3,7 +3,7 @@ import prisma from "../../lib/prisma";
 import { Prisma } from "@prisma/client";
 
 export async function POST(req: NextRequest) {
-  const { title, userId } = await req.json();
+  const { title, description, userId } = await req.json();
   if (!userId)
     return NextResponse.json({ error: "User ID missing" }, { status: 400 });
 
@@ -13,6 +13,7 @@ export async function POST(req: NextRequest) {
   const task = await prisma.task.create({
     data: {
       title,
+      description,
       userId
     },
   });
@@ -70,7 +71,7 @@ export async function DELETE(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
-  const { id, title, userId } = await req.json();
+  const { id, title, description, userId } = await req.json();
   if (!id || !userId)
     return NextResponse.json({ error: "Missing data" }, { status: 400 });
 
@@ -80,7 +81,7 @@ export async function PUT(req: NextRequest) {
 
   const updated = await prisma.task.update({
     where: { id },
-    data: { title },
+    data: { title, description },
   });
 
   return NextResponse.json(updated);

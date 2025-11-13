@@ -16,11 +16,10 @@ export default function Header({ className }: { className?: string }) {
       <div className="flex justify-between items-center px-4 py-5">
         <h1 className="text-lg sm:text-2xl tracking-wide flex items-center gap-2 text-gray-800">
           <CheckSquare className="w-6 h-6 text-gray-800" />
-          Tasks
+          <span className="hidden sm:inline">Tasks</span>
         </h1>
 
         <div className="flex items-center gap-4">
-          {/* Search Input */}
           <div
             className={`relative transition-all duration-300 ${
               isSearchOpen ? "w-64 opacity-100" : "w-0 opacity-0"
@@ -76,10 +75,10 @@ export default function Header({ className }: { className?: string }) {
 
           <button
             onClick={() => setOpenAddModal(true)}
-            className="text-white bg-gray-800 px-4 py-2 rounded-lg transition flex items-center gap-2 hover:bg-gray-700"
+            className="text-white bg-gray-800 px-3 py-2 sm:px-4 rounded-lg transition flex items-center gap-1 sm:gap-2 hover:bg-gray-700" // Adjusted padding and gap for mobile
           >
             <Plus className="w-4 h-4 text-white" />
-            Add Task
+            <span className="hidden sm:inline">Add Task</span>
           </button>
         </div>
       </div>

@@ -16,6 +16,8 @@ const jost = Jost({
   weight: ["300", "400", "500", "600", "700"],
 });
 
+const PUBLIC_ROUTES = ["/login", "/signup", "/forgot-password"];
+
 export default function RootLayout({
   children,
 }: {
@@ -24,50 +26,54 @@ export default function RootLayout({
   const HORIZONTAL_PADDING = "px-8";
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const pathname = usePathname();
-  const showLayout = pathname !== "/login";
+
+  const showLayout = !PUBLIC_ROUTES.includes(pathname); 
+
   return (
     <html className={jost.variable} lang="en">
       <body className="font-jost bg-[#f1f5ff]">
         <SessionProvider>
           <UIProvider>
-            <div className={showLayout ? "p-4 md:p-8" : ""}>
-              <div
-                className={`
-                fixed inset-y-0 left-[-7] transform lg:pt-8 lg:pr-8 lg:pl-8  
-                ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} 
-                transition-transform duration-300 ease-in-out 
-                w-64 z-50     
-                lg:translate-x-0
-              `}
-              >
-                {showLayout && (
-                  <Sidebar onClose={() => setIsSidebarOpen(false)} />
-                )}
-              </div>
-
-              {isSidebarOpen && (
+            <div className={showLayout ? "p-4 md:p-8" : ""}>              
+              {showLayout && (
                 <div
-                  className="inset-0 z-40 md:hidden lg:hidden fixed"
+                  className={`
+                    fixed inset-y-0 left-[-7] transform lg:pt-8 lg:pr-8 lg:pl-8  
+                    ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} 
+                    transition-transform duration-300 ease-in-out 
+                    w-64 z-50      
+                    lg:translate-x-0
+                  `}
+                >
+                  <Sidebar onClose={() => setIsSidebarOpen(false)} />
+                </div>
+              )}
+
+              {isSidebarOpen && showLayout && (
+                <div
+                  className="inset-0 z-40 md:hidden lg:hidden fixed bg-black/50"
                   onClick={() => setIsSidebarOpen(false)}
                 />
               )}
 
               <div className="flex-1 flex flex-col lg:ml-72">
-                <div className="sticky border-b border-gray-200 z-30">
-                  <button
-                    className="p-2 text-gray-700 lg:hidden absolute left-0 top-3 z-50"
-                    onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                  >
-                    <Bars3Icon className="h-6 w-6" />
-                  </button>
+                {showLayout && (
+                  <div className="sticky border-b border-gray-200 z-30">
+                    <button
+                      className="p-2 text-gray-700 lg:hidden absolute left-0 top-3 z-50"
+                      onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                    >
+                      <Bars3Icon className="h-6 w-6 mt-2" />
+                    </button>
 
-                  {showLayout && (
                     <Header className={`w-full ${HORIZONTAL_PADDING} `} />
-                  )}
-                </div>
-                <main className={showLayout ? "w-full py-6" : ""}>
+                  </div>
+                )}
+                
+                <main className={showLayout ? "w-full py-6" : "w-full"}> 
                   {children}{" "}
                 </main>
+                
                 {showLayout && <Footer className="w-full px-4" />}
               </div>
             </div>

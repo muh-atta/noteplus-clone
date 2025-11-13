@@ -1,24 +1,21 @@
-
 import { Task } from "../types/task";
-import {
-  PencilIcon,
-  TrashIcon,
-  LockClosedIcon,
-  UsersIcon,
-} from "@heroicons/react/24/solid";
+import { Fragment } from "react";
+import { Popover, Transition } from "@headlessui/react";
+import { PencilIcon, TrashIcon } from "@heroicons/react/24/solid";
 import EditTaskModal from "./EditTaskModel";
 import { useState } from "react";
+import { useUI } from "../context/ContextPage";
 
 type TaskFromImage = Task & {
   createdBy?: string;
   updatedAt?: string | Date;
-  sharedWith?: { type: "private" | "shared"; count: number };
+  description?: string;
 };
 
 interface TaskItemProps {
   task: TaskFromImage;
   onDelete: (id: string) => void;
-  onUpdate: (id: string, newTitle: string) => void;
+  onUpdate: (id: string, newTitle: string, description: string) => void;
   onToggle: (id: string) => void;
 }
 
@@ -35,57 +32,74 @@ export default function TaskItem({
   onUpdate,
   onToggle,
 }: TaskItemProps) {
-  const createdBy = task.createdBy || "Bud Wiser";
+  const { userName } = useUI();
+  const createdBy = userName || "Unknown";
   const updatedAt = task.updatedAt
     ? formatDate(new Date(task.updatedAt))
     : formatDate(new Date());
-  const sharedWith = task.sharedWith || {
-    type: Math.random() > 0.3 ? "shared" : "private",
-    count: Math.floor(Math.random() * 10),
-  };
-
   const [isEditing, setIsEditing] = useState(false);
 
   const handleEdit = () => setIsEditing(true);
 
   return (
-    <tr className="hover:bg-gray-50 transition-colors">
-      <td className="px-6 text-center py-11 whitespace-nowrap uppercase text-sm font-medium text-gray-900">
-        {task.title}
-      </td>
+    <tr className="hover:bg-gray-50 transition-colors align-top">
+      <td className="px-6 py-11 text-center text-sm font-medium text-gray-900 max-w-sm">
+        <Popover className="relative">
+          <Popover.Button className="truncate w-full cursor-pointer">
+            {task.title}
+          </Popover.Button>
 
-      <td className="px-6 text-center py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+          <Transition
+            as={Fragment}
+            enter="transition ease-out duration-200"
+            enterFrom="opacity-0 translate-y-1"
+            enterTo="opacity-100 translate-y-0"
+            leave="transition ease-in duration-150"
+            leaveFrom="opacity-100 translate-y-0"
+            leaveTo="opacity-0 translate-y-1"
+          >
+            <Popover.Panel className="absolute z-10 bg-white border border-gray-200 shadow-xl p-4 rounded-md left-0">
+              {task.title}
+            </Popover.Panel>
+          </Transition>
+        </Popover>
+      </td>
+      <td className="px-6 py-11 text-sm font-medium text-gray-900 max-w-xl">
+        <Popover className="relative">
+          <Popover.Button className="truncate w-full text-center cursor-pointer">
+            {task.description || "No description provided"}
+          </Popover.Button>
+
+          <Transition
+            as={Fragment}
+            enter="transition ease-out duration-200"
+            enterFrom="opacity-0 translate-y-1"
+            enterTo="opacity-100 translate-y-0"
+            leave="transition ease-in duration-150"
+            leaveFrom="opacity-100 translate-y-0"
+            leaveTo="opacity-0 translate-y-1"
+          >
+            <Popover.Panel className="absolute z-10 bg-white border border-gray-200 shadow-xl p-4 rounded-md max-w-xl left-0">
+              {task.description}
+            </Popover.Panel>
+          </Transition>
+        </Popover>
+      </td>
+      <td className="px-6 text-center py-11  whitespace-nowrap text-sm font-medium text-gray-900">
         {createdBy}
       </td>
-
-      <td className="px-6 text-center py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+      <td className="px-6 text-center py-11  whitespace-nowrap text-sm font-medium text-gray-900">
         {updatedAt}
       </td>
-
-      <td className="px-6 text-center py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-        <div className="flex items-center justify-center">
-          {sharedWith.type === "private" ? (
-            <LockClosedIcon className="h-5 w-5 text-gray-400 mr-2" />
-          ) : (
-            <UsersIcon className="h-5 w-5 text-gray-400 mr-2" />
-          )}
-          <span>
-            {sharedWith.type === "private"
-              ? "Only You"
-              : `${String(sharedWith.count).padStart(2, "0")} Share`}
-          </span>
-        </div>
-      </td>
-
-      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-center">
+      <td className="px-6 py-11 whitespace-nowrap text-sm font-medium text-center">
         <div className="flex items-center justify-center space-x-2">
           <input
             type="checkbox"
             checked={task?.done}
             onChange={() => onToggle(task.id)}
-            className="h-5 w-5 md:h-6 md:w-6 border-2 border-gray-400 rounded-md cursor-pointer 
-               appearance-none checked:bg-green-500 checked:border-green-500 
-               focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-400 transition-colors duration-200"
+            className="h-5 w-5 md:h-6 md:w-6 border-2 rounded-md cursor-pointer 
+           appearance-none checked:bg-green-500 checked:border-green-500 
+           focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-400 transition-colors duration-200"
             title={task.done ? "Mark incomplete" : "Mark complete"}
           />
 
@@ -106,11 +120,13 @@ export default function TaskItem({
           </button>
         </div>
       </td>
-
       {isEditing && (
         <EditTaskModal
           taskTitle={task.title}
-          onUpdate={(newTitle) => onUpdate(task.id, newTitle)}
+          taskDescription={task.description ?? ""}
+          onUpdate={(newTitle, newDescription) =>
+            onUpdate(task.id, newTitle, newDescription)
+          }
           onClose={() => setIsEditing(false)}
         />
       )}
