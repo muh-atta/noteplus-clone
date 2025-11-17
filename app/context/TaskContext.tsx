@@ -16,7 +16,7 @@ interface TaskContextType {
   totalPages: number;
 
   fetchTasks: (page: number, query?: string, type?: string) => Promise<void>;
-  addTask: (title: string, description: string, plan: string) => Promise<void>;
+  addTask: (title: string, description: string, plan: string,) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
   updateTask: (id: string, title: string, description: string) => Promise<void>;
   toggleTask: (id: string) => Promise<void>;
@@ -24,6 +24,7 @@ interface TaskContextType {
   handleSort: (key: string) => void;
 }
 
+type SortKey = "title" | "description";
 const TaskContext = createContext<TaskContextType | null>(null);
 
 export const TaskProvider = ({
@@ -32,7 +33,6 @@ export const TaskProvider = ({
   type,
 }: {
   children: ReactNode;
-  userId: string;
   pageSize?: number;
   type: string;
 }) => {
@@ -99,8 +99,7 @@ export const TaskProvider = ({
         });
 
         if (!res.ok) throw new Error("Delete failed");
-
-        fetchTasks(1);
+        toast.success("Deleted successfully");
       } catch {
         toast.error("Failed to delete task");
         setTasks(prevTasks);
@@ -126,8 +125,9 @@ export const TaskProvider = ({
           body: JSON.stringify({ id, title, description, userId }),
         });
         if (!res.ok) throw new Error("Update failed");
+        toast.success("Updated successfully");
       } catch {
-        alert("Failed to update");
+        toast.error("Failed to update");
         setTasks(prev);
       }
     },
@@ -139,7 +139,6 @@ export const TaskProvider = ({
       if (!userId) return;
       setTasks((prev) => prev.filter((t) => t.id !== id));
 
-      toast.success("Task Mark as Completed");
       try {
         const res = await fetch("/api/tasks", {
           method: "PATCH",
@@ -147,37 +146,47 @@ export const TaskProvider = ({
           body: JSON.stringify({ id, userId }),
         });
         if (!res.ok) throw new Error("Toggle failed");
+        toast.success("Task Mark as Completed");
       } catch {
-        // revert if failed
         setTasks((prevTasks) =>
           prevTasks.map((t) => (t.id === id ? { ...t, done: !t.done } : t))
         );
-        toast.error("Task not Mark as Completed, an error occured");
+        toast.error("An error occured");
       }
     },
     [userId]
   );
 
-  const handleSort = useCallback(
-    (key: string) => {
-      let direction = "asc";
+  const handleSort = (key: SortKey) => {
+    let direction: "asc" | "desc" = "asc";
 
-      if (sortConfig?.key === key && sortConfig.direction === "asc") {
-        direction = "desc";
+    if (sortConfig?.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+
+    setSortConfig({ key, direction });
+
+    const getValue = (task: Task) => {
+      switch (key) {
+        case "title":
+          return task.title;
+        case "description":
+          return task.description;
+        default:
+          return "";
       }
+    };
 
-      setSortConfig({ key, direction });
-
-      setTasks((prev) => {
-        return [...prev].sort((a, b) =>
-          direction === "asc"
-            ? a[key]?.localeCompare(b[key])
-            : b[key]?.localeCompare(a[key])
-        );
-      });
-    },
-    [sortConfig]
-  );
+    setTasks((prev) =>
+      [...prev].sort((a, b) => {
+        const aVal = getValue(a);
+        const bVal = getValue(b);
+        return direction === "asc"
+          ? aVal.localeCompare(bVal)
+          : bVal.localeCompare(aVal);
+      })
+    );
+  };
 
   return (
     <TaskContext.Provider
