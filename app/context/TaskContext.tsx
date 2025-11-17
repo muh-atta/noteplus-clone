@@ -9,6 +9,7 @@ import {
 import { Task } from "../types/task";
 import { toast } from "react-toastify";
 import { useSession } from "next-auth/react";
+type SortKey = "title" | "description";
 
 interface TaskContextType {
   tasks: Task[];
@@ -16,15 +17,14 @@ interface TaskContextType {
   totalPages: number;
 
   fetchTasks: (page: number, query?: string, type?: string) => Promise<void>;
-  addTask: (title: string, description: string, plan: string,) => Promise<void>;
+  addTask: (title: string, description: string, plan: string) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
   updateTask: (id: string, title: string, description: string) => Promise<void>;
   toggleTask: (id: string) => Promise<void>;
 
-  handleSort: (key: string) => void;
+  handleSort: (SortKey: any) => void;
 }
 
-type SortKey = "title" | "description";
 const TaskContext = createContext<TaskContextType | null>(null);
 
 export const TaskProvider = ({
@@ -37,7 +37,7 @@ export const TaskProvider = ({
   type: string;
 }) => {
   const { data: session, status } = useSession();
-  const userId = session?.user?.id ?? null;
+  let userId = session?.user?.id ?? null;
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(false);
   const [totalPages, setTotalPages] = useState(1);
@@ -45,7 +45,13 @@ export const TaskProvider = ({
 
   const fetchTasks = useCallback(
     async (page: number, query = "", type?: string) => {
-      if (!userId) return;
+      if (!userId) {
+        const id = localStorage.getItem("userId");
+        if (!id) {
+          return;
+        }
+        userId = id;
+      }
       setLoading(true);
       console.log("type....", type);
       const res = await fetch(
@@ -63,7 +69,7 @@ export const TaskProvider = ({
   );
 
   const addTask = useCallback(
-    async (title: string, description: string, plan: string, page: number) => {
+    async (title: string, description: string, plan: string) => {
       if (!title.trim() || !plan.trim() || !userId) return;
 
       setLoading(true);
@@ -85,7 +91,7 @@ export const TaskProvider = ({
   );
 
   const deleteTask = useCallback(
-    async (id: string, page: number) => {
+    async (id: string) => {
       if (!userId) return;
 
       const prevTasks = [...tasks];
