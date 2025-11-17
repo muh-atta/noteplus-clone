@@ -37,7 +37,7 @@ export default function RootLayout({
       <body className="font-jost bg-[#f1f5ff]">
         <SessionProvider>
           <UIProvider>
-            <TaskProvider userId="455543f6-0546-4e53-b66a-67671fe20f9f">
+            <TaskProvider>
               <AuthWrapper>
                 <ToastProvider />
                 <div className="flex min-h-screen">

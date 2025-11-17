@@ -8,6 +8,7 @@ import {
 } from "react";
 import { Task } from "../types/task";
 import { toast } from "react-toastify";
+import { useSession } from "next-auth/react";
 
 interface TaskContextType {
   tasks: Task[];
@@ -27,7 +28,6 @@ const TaskContext = createContext<TaskContextType | null>(null);
 
 export const TaskProvider = ({
   children,
-  userId,
   pageSize = 10,
   type,
 }: {
@@ -36,6 +36,8 @@ export const TaskProvider = ({
   pageSize?: number;
   type: string;
 }) => {
+  const { data: session, status } = useSession();
+  const userId = session?.user?.id ?? null;
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(false);
   const [totalPages, setTotalPages] = useState(1);
@@ -136,7 +138,7 @@ export const TaskProvider = ({
     async (id: string) => {
       if (!userId) return;
       setTasks((prev) => prev.filter((t) => t.id !== id));
-      
+
       toast.success("Task Mark as Completed");
       try {
         const res = await fetch("/api/tasks", {
