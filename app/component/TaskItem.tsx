@@ -17,6 +17,9 @@ interface TaskItemProps {
   onDelete: (id: string) => void;
   onUpdate: (id: string, newTitle: string, description: string) => void;
   onToggle: (id: string) => void;
+  showToggleActions?: boolean;
+  showEditActions?: boolean;
+  showDeleteActions?: boolean;
 }
 
 const formatDate = (date: Date): string => {
@@ -31,6 +34,9 @@ export default function TaskItem({
   onDelete,
   onUpdate,
   onToggle,
+  showToggleActions,
+  showEditActions,
+  showDeleteActions,
 }: TaskItemProps) {
   const { userName } = useUI();
   const createdBy = userName || "Unknown";
@@ -43,7 +49,7 @@ export default function TaskItem({
 
   return (
     <tr className="hover:bg-gray-50 transition-colors align-top">
-      <td className="px-6 py-11 text-center text-sm font-medium text-gray-900 max-w-sm">
+      <td className="px-4 py-8 text-center text-sm font-medium text-gray-900 truncate max-w-xs">
         <Popover className="relative">
           <Popover.Button className="truncate w-full cursor-pointer">
             {task.title}
@@ -64,7 +70,7 @@ export default function TaskItem({
           </Transition>
         </Popover>
       </td>
-      <td className="px-6 py-11 text-sm font-medium text-gray-900 max-w-xl">
+      <td className="px-4 py-8 text-center text-sm font-medium text-gray-900 truncate max-w-xs">
         <Popover className="relative">
           <Popover.Button className="truncate w-full text-center cursor-pointer">
             {task.description || "No description provided"}
@@ -85,39 +91,48 @@ export default function TaskItem({
           </Transition>
         </Popover>
       </td>
-      <td className="px-6 text-center py-11  whitespace-nowrap text-sm font-medium text-gray-900">
+      <td className="px-8 text-center py-8  whitespace-nowrap text-sm font-medium text-gray-900">
         {createdBy}
       </td>
-      <td className="px-6 text-center py-11  whitespace-nowrap text-sm font-medium text-gray-900">
+      <td className="px-8 text-center py-8  whitespace-nowrap text-sm font-medium text-gray-900">
         {updatedAt}
       </td>
-      <td className="px-6 py-11 whitespace-nowrap text-sm font-medium text-center">
+      <td className="px-8 py-8 whitespace-nowrap text-sm font-medium text-center">
         <div className="flex items-center justify-center space-x-2">
-          <input
-            type="checkbox"
-            checked={task?.done}
-            onChange={() => onToggle(task.id)}
-            className="h-5 w-5 md:h-6 md:w-6 border-2 rounded-md cursor-pointer 
+          {showToggleActions && (
+            <input
+              type="checkbox"
+              checked={task?.done}
+              onChange={() => onToggle(task.id)}
+              className="h-5 w-5 md:h-6 md:w-6 border-2 rounded-md cursor-pointer
            appearance-none checked:bg-green-500 checked:border-green-500 
            focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-400 transition-colors duration-200"
-            title={task.done ? "Mark incomplete" : "Mark complete"}
-          />
-
-          <button
-            onClick={handleEdit}
-            className="p-2 rounded-lg bg-green-100 text-green-700 hover:bg-green-200 transition-colors"
-            title="Edit"
-          >
-            <PencilIcon className="h-4 w-4" />
-          </button>
-
-          <button
-            onClick={() => onDelete(task.id)}
-            className="p-2 rounded-lg bg-pink-100 text-pink-700 hover:bg-pink-200 transition-colors"
-            title="Delete"
-          >
-            <TrashIcon className="h-4 w-4" />
-          </button>
+              title={task.done ? "Mark incomplete" : "Mark complete"}
+            />
+          )}
+          {showEditActions && (
+            <button
+              onClick={handleEdit}
+              className="p-2 rounded-lg bg-green-100 text-green-700 hover:bg-green-200 transition-colors"
+              title="Edit"
+            >
+              <PencilIcon className="h-4 w-4" />
+            </button>
+          )}
+          {showDeleteActions && (
+            <button
+              onClick={() => onDelete(task.id)}
+              className="p-2 rounded-lg bg-pink-100 text-pink-700 hover:bg-pink-200 transition-colors"
+              title="Delete"
+            >
+              <TrashIcon className="h-4 w-4" />
+            </button>
+          )}
+          {!showDeleteActions && !showEditActions && !showToggleActions && (
+            <span className="px-3 py-1 bg-red-100 text-pink-700 text-sm rounded-full">
+              Deleted
+            </span>
+          )}
         </div>
       </td>
       {isEditing && (

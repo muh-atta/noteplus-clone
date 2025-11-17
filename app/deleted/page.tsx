@@ -15,6 +15,7 @@ export default function TasksClient() {
     key: SortKey;
     direction: SortDirection;
   } | null>(null);
+  const pageSize = 10;
   const [userId, setUserId] = useState<string | null>(null);
   const { searchQuery, openAddModal, setOpenAddModal } = useUI();
   const [title, setTitle] = useState("");
@@ -23,9 +24,9 @@ export default function TasksClient() {
   const {
     tasks,
     loading,
-    totalPages,
     fetchTasks,
     addTask,
+    totalPages,
     deleteTask,
     updateTask,
     toggleTask,
@@ -45,7 +46,8 @@ export default function TasksClient() {
     if (!userId) return;
 
     const timeout = setTimeout(() => {
-      fetchTasks(page, searchQuery, 'all');
+      fetchTasks(page, searchQuery);
+      fetchTasks(page, searchQuery, 'status');
     }, 400);
 
     return () => clearTimeout(timeout);
@@ -62,7 +64,7 @@ export default function TasksClient() {
             { key: "updated", label: "Updated", sortable: true },
             { key: "action", label: "Action" },
           ]}
-          data={tasks.filter((t) => t.done === false && t.status === false)}
+          data={tasks.filter((t) => t.status === true)}
           loading={loading}
           sortConfig={sortConfig}
           onSort={handleSort}
@@ -73,9 +75,9 @@ export default function TasksClient() {
               onDelete={deleteTask}
               onUpdate={updateTask}
               onToggle={toggleTask}
-              showToggleActions={true}
-              showDeleteActions={true}
-              showEditActions={true}
+              showToggleActions={false}
+              showDeleteActions={false}
+              showEditActions={false}
             />
           )}
         />

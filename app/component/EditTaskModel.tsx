@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-
+import { toast } from "react-toastify";
 interface EditTaskModalProps {
   taskTitle: string;
   taskDescription: string | "";
@@ -14,19 +14,19 @@ export default function EditTaskModal({
   onUpdate,
   onClose,
 }: EditTaskModalProps) {
-  console.log("taskTitle,taskDescription,", taskTitle,taskDescription,)
+  console.log("taskTitle,taskDescription,", taskTitle, taskDescription);
   const [title, setTitle] = useState(taskTitle);
   const [description, setDescription] = useState(taskDescription);
 
   const handleSave = () => {
     if (title.trim() !== "" && description.trim() !== "") {
       if (title.length > 50) {
-        alert("title cant be greater than 50 words");
-        return
+        toast.error("Title cannot be greater than 50 characters!");
+        return;
       }
-      if (description.length > 50) {
-        alert("description cant be greater than 50 words");
-        return
+      if (description.length > 300) {
+        toast.error("Description cannot be greater than 300 characters!");
+        return;
       }
       onUpdate(title, description);
       onClose();
@@ -38,26 +38,27 @@ export default function EditTaskModal({
       <div className="bg-white rounded-xl w-11/12 max-w-sm p-6 shadow-2xl">
         <h2 className="text-xl text-gray-800 mb-6">Edit Task</h2>
 
-        <h4 className="text-gray-800 mb-2">Task</h4>
+        <div className="mb-4">
+          <h4 className="text-gray-800 mb-2">Task</h4>
+          <textarea
+            className="w-full px-4 py-3 rounded-xl border border-gray-300 bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 transition resize-none"
+            placeholder="Add New Task"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            rows={2}
+          />
+        </div>
 
-        <input
-          type="text"
-          className="w-full px-4 py-3 rounded-xl border border-gray-300 bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 transition"
-          placeholder="New Details"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-
-        <h4 className="text-gray-800 mb-2">Description</h4>
-
-        <input
-          type="text"
-          className="w-full px-4 py-3 rounded-xl border border-gray-300 bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 transition"
-          placeholder="New Details"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-
+        <div className="mb-4">
+          <h4 className="text-gray-800 mb-2">Description</h4>
+          <textarea
+            className="w-full px-4 py-3 rounded-xl border border-gray-300 bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 transition resize-none"
+            placeholder="Add Description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={4}
+          />
+        </div>
         <div className="flex justify-end gap-3 mt-8">
           <button
             className="px-6 py-2 rounded-lg bg-gray-800 text-white font-semibold hover:bg-gray-700 transition"

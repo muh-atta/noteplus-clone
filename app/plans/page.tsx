@@ -23,8 +23,8 @@ export default function TasksClient() {
   const {
     tasks,
     loading,
-    totalPages,
     fetchTasks,
+    totalPages,
     addTask,
     deleteTask,
     updateTask,
@@ -45,7 +45,7 @@ export default function TasksClient() {
     if (!userId) return;
 
     const timeout = setTimeout(() => {
-      fetchTasks(page, searchQuery, 'all');
+      fetchTasks(page, searchQuery, "plans");
     }, 400);
 
     return () => clearTimeout(timeout);
@@ -62,7 +62,7 @@ export default function TasksClient() {
             { key: "updated", label: "Updated", sortable: true },
             { key: "action", label: "Action" },
           ]}
-          data={tasks.filter((t) => t.done === false && t.status === false)}
+          data={tasks}
           loading={loading}
           sortConfig={sortConfig}
           onSort={handleSort}

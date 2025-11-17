@@ -12,7 +12,7 @@ export default function Page() {
     if (status === "loading") return;
 
     if (session?.user) {
-      localStorage.setItem("userSession", JSON.stringify(session));      
+      localStorage.setItem("userSession", JSON.stringify(session));
       if (session.user.id) {
         localStorage.setItem("userId", session.user.id);
       }

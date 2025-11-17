@@ -1,1 +1,4 @@
-export type Task = { id: string; title: string; done: boolean };
+export type Task = {
+  status: boolean;
+  completed: any; id: string; title: string; done: boolean 
+};

@@ -16,6 +16,8 @@ interface UIContextType {
   setTriggerRefresh: (v: boolean) => void;
   userName: string;
   setUserName: (name: string) => void;
+  userId: string;
+  setUserId: (userId: string) => void;
   sessionLoading: boolean;
 }
 
@@ -28,12 +30,13 @@ export const UIProvider = ({ children }: { children: ReactNode }) => {
   const [openAddModal, setOpenAddModal] = useState(false);
   const [triggerRefresh, setTriggerRefresh] = useState(false);
   const [userName, setUserName] = useState("");
-
+  const [userId, setUserId] = useState("");
   const sessionLoading = status === "loading";
 
   useEffect(() => {
     if (status === "authenticated" && session?.user?.name) {
       setUserName(session.user.name);
+      setUserId(session.user.id)
     } else if (status === "unauthenticated") {
       setUserName("");
     }
@@ -52,6 +55,8 @@ export const UIProvider = ({ children }: { children: ReactNode }) => {
         setTriggerRefresh,
         userName,
         setUserName,
+        userId,
+        setUserId,
         sessionLoading,
       }}
     >

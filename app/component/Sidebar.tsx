@@ -1,47 +1,89 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   PencilSquareIcon,
   FolderIcon,
   ClockIcon,
-  TagIcon,
   TrashIcon,
-  HashtagIcon,
-  ChevronRightIcon,
   DocumentTextIcon,
+  ChevronLeftIcon,
+  Bars3Icon,
+  ChevronDownIcon,
 } from "@heroicons/react/24/solid";
 import Image from "next/image";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import IconImage from "../image/5817-man-person.png";
 import { signOut } from "next-auth/react";
 import { LogOut } from "lucide-react";
-import SideBkg from "../image/side-bkg.png";
+import SideBkg from "../image/Gemini_Generated_Image_ggcvbxggcvbxggcv.png";
 import { useUI } from "../context/ContextPage";
+import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
-export default function Sidebar({ onClose }: { onClose: () => void }) {
+export default function Sidebar({
+  onClose,
+  isCollapsed,
+  setIsCollapsed,
+}: {
+  onClose: () => void;
+  isCollapsed: boolean;
+  setIsCollapsed: (isCollapsed: boolean) => void;
+}) {
   const [isNotebooksOpen, setIsNotebooksOpen] = useState(true);
-  const [activeItem, setActiveItem] = useState("Your Notes");
+  const pathname = usePathname();
+  const [activeItem, setActiveItem] = useState("tasks");
   const { userName } = useUI();
+  const router = useRouter();
   const handleClick = (item: string) => {
-    if (item === "Your Notes") {
-      setActiveItem(item);
-    } else {
-      alert("Feature Coming soon!");
-    }
+    setActiveItem(item);
   };
+
+  const toggleCollapse = () => {
+    setIsCollapsed(!isCollapsed);
+  };
+
+  const sidebarWidthClass = isCollapsed ? "w-20" : "w-74";
+  const textVisibilityClass = isCollapsed ? "hidden" : "inline-block";
+
+  useEffect(() => {
+    console.log("pathname", pathname)
+    handleClick(pathname.substring(1));
+  }, [pathname]);
 
   return (
     <aside
-      className="h-full sticky top-0 w-66 flex flex-col bg-white border-r border-gray-200 
-  lg:rounded-t-xl space-y-6"
+      className={`h-full sticky px-3 py-4 top-0 ${sidebarWidthClass} flex flex-col bg-white border-r border-gray-200 space-y-6 transition-all duration-300 ease-in-out`}
     >
-      <div className="flex justify-between px-5 pt-5">
-        <div className="flex items-center space-x-3 px-1">
-          <div className="bg-gray-800 p-2.5 rounded-xl">
-            <PencilSquareIcon className="h-10 w-10 text-white" />
+      <div className={`flex items-center justify-between px-2 pt-5`}>
+        {isCollapsed ? (
+          <button
+            onClick={toggleCollapse}
+            className="p-1 rounded-full text-gray-600 hover:bg-gray-100 transition"
+            title="Open Sidebar"
+          >
+            <Bars3Icon className="h-6 w-6" />
+          </button>
+        ) : (
+          <div className="flex items-center space-x-3 shrink-0">
+            <div className="bg-gray-800 p-2.5 rounded-xl">
+              <PencilSquareIcon className="h-10 w-10 text-white" />
+            </div>
+            <span className="text-xl text-gray-800 font-semibold">
+              NotePlus
+            </span>
           </div>
-          <span className="text-xl text-gray-800 font-semibold">NotePlus</span>
-        </div>
+        )}
+
+        {!isCollapsed && (
+          <button
+            onClick={toggleCollapse}
+            className="p-1 rounded-full text-gray-600 hover:bg-gray-100 transition hidden lg:inline-block ml-auto"
+            title="Collapse Sidebar"
+          >
+            <ChevronLeftIcon className="h-5 w-5" />
+          </button>
+        )}
+
         <div className="flex justify-end lg:hidden">
           <button onClick={onClose} className="p-2 text-gray-900">
             <XMarkIcon className="h-8 w-8" />
@@ -49,119 +91,197 @@ export default function Sidebar({ onClose }: { onClose: () => void }) {
         </div>
       </div>
 
-      <hr className="border-gray-300 mx-5" />
+      <hr className="border-gray-300 mx-3" />
 
-      <button className="flex items-center justify-between w-full px-5 py-2.5 hover:bg-gray-100 transition">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
+      <div className="overflow-y-auto flex flex-col justify-between h-screen relative">
+        <div>
+          <button
+            className={`flex items-center w-full mb-8 px-4 py-2.5 
+          ${isCollapsed ? "justify-center" : "justify-between"}`}
+          >
+            <div
+              className={`flex items-center  ${
+                isCollapsed ? "justify-center" : "space-x-4"
+              }`}
+            >
+              <div
+                className={`w-8 h-8 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden`}
+              >
+                <Image
+                  src={IconImage}
+                  alt="User Avatar"
+                  width={43}
+                  height={43}
+                  className="object-cover"
+                />
+              </div>
+              <div
+                className={`font-semibold text-lg transition text-gray-800 ${textVisibilityClass}`}
+              >
+                {userName ? (
+                  userName
+                ) : (
+                  <div className="h-5 w-20 bg-gray-200 rounded animate-pulse"></div>
+                )}
+              </div>
+            </div>
+          </button>
+          <nav className="flex-1 flex flex-col space-y-4 px-2">
+            <button
+              onClick={() => {
+                handleClick("tasks"), router.push("/tasks");
+              }}
+              className={`flex items-center p-2.5 rounded-lg font-medium transition 
+              ${isCollapsed ? "justify-center" : "space-x-3"} 
+              ${
+                activeItem === "tasks"
+                  ? "bg-gray-200 text-gray-900 font-semibold"
+                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-800"
+              }`}
+            >
+              <DocumentTextIcon className="h-6 w-6 shrink-0" />
+              <span className={textVisibilityClass}>Your Tasks</span>
+            </button>
+
+            <div>
+              <button
+                onClick={() => {
+                  setIsNotebooksOpen(!isNotebooksOpen);
+                }}
+                className={`flex items-center w-full p-2.5 rounded-lg text-gray-600 font-medium hover:bg-gray-100 hover:text-gray-800 transition 
+                ${isCollapsed ? "justify-center" : "justify-between"}`}
+              >
+                <div
+                  className={`flex items-center ${
+                    isCollapsed ? "justify-center" : "space-x-3"
+                  }`}
+                >
+                  <FolderIcon className="h-6 w-6 shrink-0" />
+                  <span className={textVisibilityClass}>Notebooks</span>
+                </div>
+                {!isCollapsed && (
+                  <ChevronDownIcon
+                    className={`h-5 w-5 transition-transform duration-300 shrink-0 ${
+                      isNotebooksOpen ? "transform rotate-180" : ""
+                    }`}
+                  />
+                )}
+              </button>
+
+              {isNotebooksOpen && !isCollapsed && (
+                <div className="pl-4 mt-2 space-y-2">
+                  <button
+                    onClick={() => {
+                      handleClick("project"), router.push("/project");
+                    }}
+                    className={`flex items-center w-full p-2 rounded-lg text-gray-600 font-medium hover:bg-gray-100 hover:text-gray-800 transition space-x-3 ${
+                      activeItem === "project"
+                        ? "bg-gray-200 text-gray-900 font-semibold"
+                        : "text-gray-600 hover:bg-gray-100 hover:text-gray-800"
+                    }`}
+                  >
+                    <FolderIcon className="h-5 w-5 shrink-0 text-gray-400" />{" "}
+                    <span>Project Plans</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      handleClick("routine"), router.push("/routine");
+                    }}
+                    className={`flex items-center w-full p-2 rounded-lg text-gray-600 font-medium hover:bg-gray-100 hover:text-gray-800 transition space-x-3 ${
+                      activeItem === "routine"
+                        ? "bg-gray-200 text-gray-900 font-semibold"
+                        : "text-gray-600 hover:bg-gray-100 hover:text-gray-800"
+                    }`}
+                  >
+                    <FolderIcon className="h-5 w-5 shrink-0 text-gray-400" />
+                    <span>Routine Notes</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      handleClick("plans"), router.push("/plans");
+                    }}
+                    className={`flex items-center w-full p-2 rounded-lg text-gray-600 font-medium hover:bg-gray-100 hover:text-gray-800 transition space-x-3 ${
+                      activeItem === "plans"
+                        ? "bg-gray-200 text-gray-900 font-semibold"
+                        : "text-gray-600 hover:bg-gray-100 hover:text-gray-800"
+                    }`}
+                  >
+                    <FolderIcon className="h-5 w-5 shrink-0 text-gray-400" />
+                    <span>Planning</span>
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Reminder */}
+            <button
+              onClick={() => {
+                handleClick("completed"), router.push("/completed");
+              }}
+              className={`flex items-center p-2.5 rounded-lg text-gray-600 font-medium hover:bg-gray-100 hover:text-gray-800 transition ${
+                isCollapsed ? "justify-center" : "space-x-3"
+              }${
+                activeItem === "completed"
+                  ? "bg-gray-200 text-gray-900 font-semibold"
+                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-800"
+              }`}
+            >
+              <ClockIcon className="h-6 w-6 shrink-0" />
+              <span className={textVisibilityClass}> &nbsp; Completed </span>
+            </button>
+
+            <button
+              onClick={() => {
+                handleClick("deleted"), router.push("/deleted");
+              }}
+              className={`flex items-center p-2.5 rounded-lg text-gray-600 font-medium hover:bg-gray-100 hover:text-gray-800 transition ${
+                isCollapsed ? "justify-center" : "space-x-3"
+              }
+              ${
+                activeItem === "deleted"
+                  ? "bg-gray-200 text-gray-900 font-semibold"
+                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-800"
+              }`}
+            >
+              <TrashIcon className="h-6 w-6 shrink-0" />
+              <span className={textVisibilityClass}>Bin</span>
+            </button>
+
+            <button
+              onClick={() => {
+                localStorage.removeItem("userSession");
+                localStorage.removeItem("userId");
+                signOut({ callbackUrl: "/login" });
+              }}
+              className={`text-gray-800 p-2.5 rounded-lg hover:bg-gray-100 transition flex items-center cursor-pointer 
+              ${isCollapsed ? "justify-center" : "space-x-3 px-4"}`}
+            >
+              <LogOut className="w-5 h-5 shrink-0" />
+              <span
+                className={`text-gray-600 font-medium ${textVisibilityClass}`}
+              >
+                Logout
+              </span>
+            </button>
+          </nav>
+        </div>
+        <div
+          className={`flex flex-col items-center justify-center text-center space-y-4 mt-15 px-5 transition-opacity duration-300 ${
+            isCollapsed ? "opacity-0 h-0 overflow-hidden" : "opacity-100"
+          }`}
+        >
+          <div className="relative w-full h-[250px] overflow-hidden">
             <Image
-              src={IconImage}
-              alt="User Avatar"
-              width={40}
-              height={40}
-              className="object-cover"
+              src={SideBkg}
+              alt="Upgrade"
+              fill
+              className="object-cover object-center scale-110"
+              priority
             />
           </div>
-          <span className="font-semibold text-gray-800">{userName}</span>
-        </div>
-      </button>
-
-      <div className="overflow-y-auto flex-1 pb-5 custom-scroll-hide">
-        <nav className="flex-1 flex flex-col space-y-4 mt-6 px-5">
-          <button
-            onClick={() => handleClick("Your Notes")}
-            className={`flex items-center space-x-3 p-2.5 rounded-lg font-medium transition ${
-              activeItem === "Your Notes"
-                ? "bg-gray-200 text-gray-900 font-semibold"
-                : "text-gray-600 hover:bg-gray-100 hover:text-gray-800"
-            }`}
-          >
-            <DocumentTextIcon className="h-6 w-6" />
-            <span>Your Notes</span>
-          </button>
-
-          <button
-            onClick={() => {
-              setIsNotebooksOpen(!isNotebooksOpen);
-              alert("Feature Coming soon!");
-            }}
-            className="flex items-center justify-between w-full p-2.5 rounded-lg text-gray-600 font-medium hover:bg-gray-100 hover:text-gray-800 transition"
-          >
-            <div className="flex items-center space-x-3">
-              <FolderIcon className="h-6 w-6" />
-              <span>Notebooks</span>
-            </div>
-          </button>
-
-          <button
-            onClick={() => handleClick("Reminder")}
-            className="flex items-center space-x-3 p-2.5 rounded-lg text-gray-600 font-medium hover:bg-gray-100 hover:text-gray-800 transition"
-          >
-            <ClockIcon className="h-6 w-6" />
-            <span>Reminder</span>
-          </button>
-
-          {/* Tags */}
-          <button
-            onClick={() => handleClick("Tags")}
-            className="flex items-center space-x-3 p-2.5 rounded-lg text-gray-600 font-medium hover:bg-gray-100 hover:text-gray-800 transition"
-          >
-            <TagIcon className="h-6 w-6" />
-            <span>Tags</span>
-          </button>
-
-          {/* Bin */}
-          <button
-            onClick={() => handleClick("Bin")}
-            className="flex items-center space-x-3 p-2.5 rounded-lg text-gray-600 font-medium hover:bg-gray-100 hover:text-gray-800 transition"
-          >
-            <TrashIcon className="h-6 w-6" />
-            <span>Bin</span>
-          </button>
-
-          {/* Other Page */}
-          <button
-            onClick={() => handleClick("Other Page")}
-            className="flex items-center justify-between p-2.5 rounded-lg text-gray-600 font-medium hover:bg-gray-100 hover:text-gray-800 transition"
-          >
-            <div className="flex items-center space-x-3">
-              <HashtagIcon className="h-6 w-6" />
-              <span>Other Page</span>
-            </div>
-            <ChevronRightIcon className="h-5 w-5" />
-          </button>
-
-          {/* Logout */}
-          <button
-            onClick={() => {
-              localStorage.removeItem("userSession");
-              localStorage.removeItem("userId");
-              signOut({ callbackUrl: "/login" });
-            }}
-            className="text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-100 transition flex items-center gap-2 cursor-pointer"
-          >
-            <LogOut className="w-5 h-5" />
-            Logout
-          </button>
-        </nav>
-
-        <div className="flex flex-col items-center justify-center text-center space-y-4 mt-8 px-5">
-          <Image
-            src={SideBkg}
-            width={200}
-            height={180}
-            alt="Upgrade"
-            className="mx-auto"
-          />
           <p className="text-gray-400">
-            Set Business Account To Explore Premium Features
+            Stay organized and simplify your daily task tracking.
           </p>
-          <button
-            className="w-24 bg-gray-800 text-white py-2.5 rounded-xl transition"
-            onClick={() => handleClick("Other Page")}
-          >
-            Upgrade
-          </button>
         </div>
       </div>
     </aside>

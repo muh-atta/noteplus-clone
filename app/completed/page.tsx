@@ -23,9 +23,9 @@ export default function TasksClient() {
   const {
     tasks,
     loading,
-    totalPages,
     fetchTasks,
     addTask,
+    totalPages,
     deleteTask,
     updateTask,
     toggleTask,
@@ -45,12 +45,11 @@ export default function TasksClient() {
     if (!userId) return;
 
     const timeout = setTimeout(() => {
-      fetchTasks(page, searchQuery, 'all');
+      fetchTasks(page, searchQuery, "done");
     }, 400);
 
     return () => clearTimeout(timeout);
   }, [page, searchQuery, userId]);
-
   return (
     <div className=" flex flex-col bg-gray-100 p-4 gap-12">
       <div className="flex-1 bg-gray-50 flex flex-col">
@@ -62,7 +61,7 @@ export default function TasksClient() {
             { key: "updated", label: "Updated", sortable: true },
             { key: "action", label: "Action" },
           ]}
-          data={tasks.filter((t) => t.done === false && t.status === false)}
+          data={tasks.filter((t) => t.done === true)}
           loading={loading}
           sortConfig={sortConfig}
           onSort={handleSort}
@@ -73,9 +72,9 @@ export default function TasksClient() {
               onDelete={deleteTask}
               onUpdate={updateTask}
               onToggle={toggleTask}
-              showToggleActions={true}
+              showToggleActions={false}
               showDeleteActions={true}
-              showEditActions={true}
+              showEditActions={false}
             />
           )}
         />
