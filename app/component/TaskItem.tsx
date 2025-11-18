@@ -1,7 +1,7 @@
 import { Task } from "../types/task";
 import { Fragment } from "react";
 import { Popover, Transition } from "@headlessui/react";
-import { PencilIcon, TrashIcon } from "@heroicons/react/24/solid";
+import { PencilIcon, TrashIcon, PlusIcon, CheckIcon } from "@heroicons/react/24/solid";
 import EditTaskModal from "./EditTaskModel";
 import { useState } from "react";
 import { useUI } from "../context/ContextPage";
@@ -100,15 +100,19 @@ export default function TaskItem({
       <td className="px-8 py-8 whitespace-nowrap text-sm font-medium text-center">
         <div className="flex items-center justify-center space-x-2">
           {showToggleActions && (
-            <input
-              type="checkbox"
-              checked={task?.done}
-              onChange={() => onToggle(task.id)}
-              className="h-5 w-5 md:h-6 md:w-6 border-2 rounded-md cursor-pointer
-           appearance-none checked:bg-green-500 checked:border-green-500 
-           focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-400 transition-colors duration-200"
-              title={task.done ? "Mark incomplete" : "Mark complete"}
-            />
+          <button
+            onClick={() => onToggle(task.id)}
+            className={`
+              p-2 rounded-lg transition-colors
+              ${task.done
+                ? "bg-green-100 text-green-700 hover:bg-green-200"
+                : "bg-gray-200 text-gray-900 hover:bg-gray-400"}
+              flex items-center justify-center
+            `}
+            title={task.done ? "Mark incomplete" : "Mark complete"}
+          >
+            {task.done ? <CheckIcon className="w-4 h-4" /> : <PlusIcon className="w-4 h-4" />}
+          </button>
           )}
           {showEditActions && (
             <button

@@ -6,7 +6,6 @@ import "./globals.css";
 import { SessionProvider } from "next-auth/react";
 import Footer from "./component/Footer";
 import Sidebar from "./component/Sidebar";
-import { Bars3Icon } from "@heroicons/react/24/solid";
 import { usePathname } from "next/navigation";
 import { UIProvider } from "./context/ContextPage";
 import AuthWrapper from "./component/AuthWrapper";
@@ -32,6 +31,7 @@ export default function RootLayout({
   const showLayout = !PUBLIC_ROUTES.includes(pathname);
 
   const mainContentOffsetClass = isCollapsed ? "lg:ml-20" : "lg:ml-74";
+  console.log("isCollapsed", isCollapsed)
   return (
     <html className={jost.variable} lang="en">
       <body className="font-jost bg-[#f1f5ff]">
@@ -44,7 +44,7 @@ export default function RootLayout({
                   {showLayout && (
                     <div
                       className={`
-                    fixed inset-y-0 left-0 z-50 bg-white
+                    fixed inset-y-0 left-0 z-100 bg-white
                     ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} 
                     lg:translate-x-0
                   `}
@@ -59,7 +59,10 @@ export default function RootLayout({
                   <div
                     className={`min-h-screen w-full flex flex-col transition-all duration-300 ease-in-out ${mainContentOffsetClass}`}
                   >
-                    {showLayout && <Header />}
+                    {showLayout && <Header 
+                        onClose={() => setIsSidebarOpen(false)}
+                        isCollapsed={isCollapsed}
+                        setIsCollapsed={setIsCollapsed} />}
 
                     <main className="flex-1">{children}</main>
 

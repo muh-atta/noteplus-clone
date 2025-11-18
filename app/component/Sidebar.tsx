@@ -51,9 +51,17 @@ export default function Sidebar({
   }, [pathname]);
 
   return (
-    <aside
-      className={`h-full sticky px-3 py-4 top-0 ${sidebarWidthClass} flex flex-col bg-white border-r border-gray-200 space-y-6 transition-all duration-300 ease-in-out`}
-    >
+   <aside
+  className={`
+    fixed lg:static top-0 left-0 h-full
+    px-3 py-4 ${sidebarWidthClass}
+    flex flex-col bg-white border-r border-gray-200 space-y-6
+    z-50 transition-transform duration-300 ease-in-out
+    ${isCollapsed ? "-translate-x-[110%]" : "translate-x-0"} 
+    lg:translate-x-0
+  `}
+>
+
       <div className={`flex items-center justify-between px-2 pt-5`}>
         {isCollapsed ? (
           <button
@@ -77,18 +85,12 @@ export default function Sidebar({
         {!isCollapsed && (
           <button
             onClick={toggleCollapse}
-            className="p-1 rounded-full text-gray-600 hover:bg-gray-100 transition hidden lg:inline-block ml-auto"
+            className="p-1 rounded-full text-gray-600 hover:bg-gray-100 transition ml-auto"
             title="Collapse Sidebar"
           >
             <ChevronLeftIcon className="h-5 w-5" />
           </button>
         )}
-
-        <div className="flex justify-end lg:hidden">
-          <button onClick={onClose} className="p-2 text-gray-900">
-            <XMarkIcon className="h-8 w-8" />
-          </button>
-        </div>
       </div>
 
       <hr className="border-gray-300 mx-3" />

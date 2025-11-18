@@ -31,13 +31,13 @@ export default function Table({
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-md flex flex-col">
+    <div className="bg-white shadow-md flex flex-col">
       <div
-        className={`overflow-auto custom-scroll-hide ${
+        className={`overflow-x-auto w-full custom-scroll-hide ${
           page > 1 ? "h-[calc(100vh-300px)]" : "h-[calc(100vh-200px)]"
         }`}
       >
-        <table className="w-full rounded-xl table-fixed">
+        <table className="min-w-[700px] md:min-w-full w-full rounded-xl table-fixed">
           <thead className="bg-gray-800 text-white">
             <tr>
               {columns.map((col, index) => (
@@ -45,8 +45,8 @@ export default function Table({
                   key={col.key}
                   className={`
                     px-4 py-3 text-center cursor-pointer select-none
-                    ${index === 0 ? "rounded-l-2xl" : ""} 
-                    ${index === columns.length - 1 ? "rounded-r-2xl" : ""}
+                    ${index === 0 ? "" : ""} 
+                    ${index === columns.length - 1 ? "" : ""}
                   `}
                   onClick={() => col.sortable && onSort?.(col.key)}
                 >
@@ -62,20 +62,20 @@ export default function Table({
           </thead>
 
           <tbody className="divide-y divide-gray-200">
-            {loading ? (
-              Array.from({ length: 10 }).map((_, i) => <SkeletonRow key={i} />)
-            ) : data.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={columns.length}
-                  className="py-6 text-center text-gray-500 text-lg"
-                >
-                  No data found
-                </td>
-              </tr>
-            ) : (
-              data.map((item) => renderRow(item))
-            )}
+            {loading
+              ? Array.from({ length: 10 }).map((_, i) => <SkeletonRow key={i} />)
+              : data.length === 0
+              ? (
+                <tr>
+                  <td
+                    colSpan={columns.length}
+                    className="py-6 text-center text-gray-500 text-lg"
+                  >
+                    No data found
+                  </td>
+                </tr>
+              )
+              : data.map((item) => renderRow(item))}
           </tbody>
         </table>
       </div>

@@ -28,6 +28,7 @@ body {
 .custom-scroll-hide {
   scrollbar-width: thin;       /* Firefox */
   scrollbar-color: transparent transparent; /* Firefox */
+  scrollbar-width: none;
 }
 
 .custom-scroll-hide::-webkit-scrollbar {

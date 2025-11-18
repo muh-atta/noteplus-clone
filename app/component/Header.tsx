@@ -4,24 +4,41 @@ import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import { useUI } from "../context/ContextPage";
 import { usePathname } from "next/navigation";
+import { Bars3Icon } from "@heroicons/react/24/solid";
 
-export default function Header() {
+export default function Header({
+  onClose,
+  isCollapsed,
+  setIsCollapsed,
+}: {
+  onClose: () => void;
+  isCollapsed: boolean;
+  setIsCollapsed: (isCollapsed: boolean) => void;
+}) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { searchQuery, setSearchQuery, setOpenAddModal } = useUI();
   const [search, setSearch] = useState(searchQuery);
   const pathname = usePathname();
+  const toggleCollapse = () => {
+    setIsCollapsed(!isCollapsed);
+  };
 
   const routeName = pathname.split("/").filter(Boolean).pop() || "Tasks";
 
-  // Format to Title Case
   const formattedName = routeName
     .replace(/-/g, " ")
     .replace(/\b\w/g, (c) => c.toUpperCase());
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200 w-full">
-      <div className="flex justify-between items-center px-18 py-5">
-        <h1 className="text-lg sm:text-2xl tracking-wide flex items-center gap-2 text-gray-800">
-          <CheckSquare className="w-6 h-6 text-gray-800" />
+      
+    <div className="flex justify-between items-center px-4 sm:px-8 md:px-16 lg:px-20 py-5">
+
+          <h1 className="text-lg sm:text-2xl flex items-center gap-2 tracking-wide text-gray-800">
+          <Bars3Icon
+            className="w-6 h-6 text-gray-800 lg:hidden"
+            onClick={toggleCollapse}
+          />
+          <CheckSquare className="w-6 h-6 text-gray-800 hidden lg:inline" />
           <span className="hidden sm:inline">{formattedName}</span>
         </h1>
 
@@ -32,25 +49,26 @@ export default function Header() {
             }`}
           >
             {isSearchOpen && (
-              <div className="relative transition-all duration-300">
-                <input
-                  type="text"
-                  placeholder="Find Your Task..."
-                  className="w-full pl-10 pr-4 py-2 bg-gray-100 rounded-xl text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-300"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  autoFocus
-                />
-                <button
-                  type="button"
-                  className={
-                    "absolute left-2 top-1/2 -translate-y-1/2 p-1 rounded-full transition hover:bg-gray-200 text-gray-500 hover:text-black"
-                  }
-                >
-                  <MagnifyingGlassIcon className="h-5 w-5 transitiontext-gray-500" />
-                </button>
-              </div>
-            )}
+          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50 w-11/12 sm:w-1/3">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Find Your Task..."
+                className="w-full pl-10 pr-4 py-2 bg-white rounded-xl text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-300"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                autoFocus
+              />
+
+      <div className="absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none">
+        <MagnifyingGlassIcon className="h-5 w-5 text-gray-500" />
+      </div>
+    </div>
+  </div>
+)}
+
+
+
           </div>
 
           <button
