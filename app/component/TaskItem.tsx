@@ -1,10 +1,12 @@
 import { Task } from "../types/task";
 import { Fragment } from "react";
 import { Popover, Transition } from "@headlessui/react";
-import { PencilIcon, TrashIcon, PlusIcon, CheckIcon } from "@heroicons/react/24/solid";
+import { PencilIcon, TrashIcon, PlusIcon } from "@heroicons/react/24/solid";
+import { RotateCcw } from "lucide-react";
 import EditTaskModal from "./EditTaskModel";
 import { useState } from "react";
 import { useUI } from "../context/ContextPage";
+import ConfirmModal from "./ConfirmModal";
 
 type TaskFromImage = Task & {
   createdBy?: string;
@@ -29,6 +31,7 @@ const formatDate = (date: Date): string => {
   });
 };
 
+
 export default function TaskItem({
   task,
   onDelete,
@@ -45,8 +48,15 @@ export default function TaskItem({
     : formatDate(new Date());
   const [isEditing, setIsEditing] = useState(false);
 
-  const handleEdit = () => setIsEditing(true);
+  const [confirmAction, setConfirmAction] = useState<null | "edit" | "delete" | "toggle">(null);
+  const handleConfirm = () => {
+    if (confirmAction === "delete") onDelete(task.id);
+    if (confirmAction === "toggle") onToggle(task.id);
+    setConfirmAction(null);
+  };
 
+  const handleCancel = () => setConfirmAction(null);
+  console.log("showToggleActions", showDeleteActions)
   return (
     <tr className="hover:bg-gray-50 transition-colors align-top">
       <td className="px-4 py-8 text-center text-sm font-medium text-gray-900 truncate max-w-xs">
@@ -97,48 +107,51 @@ export default function TaskItem({
       <td className="px-8 text-center py-8  whitespace-nowrap text-sm font-medium text-gray-900">
         {updatedAt}
       </td>
-      <td className="px-8 py-8 whitespace-nowrap text-sm font-medium text-center">
-        <div className="flex items-center justify-center space-x-2">
-          {showToggleActions && (
-          <button
-            onClick={() => onToggle(task.id)}
-            className={`
-              p-2 rounded-lg transition-colors
-              ${task.done
-                ? "bg-green-100 text-green-700 hover:bg-green-200"
-                : "bg-gray-200 text-gray-900 hover:bg-gray-400"}
-              flex items-center justify-center
-            `}
-            title={task.done ? "Mark incomplete" : "Mark complete"}
-          >
-            {task.done ? <CheckIcon className="w-4 h-4" /> : <PlusIcon className="w-4 h-4" />}
-          </button>
-          )}
-          {showEditActions && (
+       <td className="px-8 py-8 whitespace-nowrap text-sm font-medium text-center">
+          <div className="flex items-center justify-center space-x-2">
+        {(showDeleteActions || showToggleActions) && (              <button
+                onClick={() => setConfirmAction("toggle")}
+                className={`
+                  p-2 rounded-lg transition-colors
+                  ${task.done
+                    ? "bg-green-100 text-green-700 hover:bg-green-200"
+                    : "bg-gray-200 text-gray-900 hover:bg-gray-400"}
+                  flex items-center justify-center
+                `}
+                title={task.done ? "Mark incomplete" : "Mark complete"}
+              >
+                {task.done ? <RotateCcw className="w-4 h-4" /> : <PlusIcon className="w-4 h-4" />}
+              </button>
+            )}
+            {showEditActions && (
+              <button
+                onClick={() => setIsEditing(true)}
+                className="p-2 rounded-lg bg-green-100 text-green-700 hover:bg-green-200 transition-colors"
+                title="Edit"
+              >
+                <PencilIcon className="h-4 w-4" />
+              </button>
+            )}
+            {showDeleteActions && (
+              <button
+                onClick={() => setConfirmAction("delete")}
+                className="p-2 rounded-lg bg-pink-100 text-pink-700 hover:bg-pink-200 transition-colors"
+                title="Delete"
+              >
+                <TrashIcon className="h-4 w-4" />
+              </button>
+            )}
+            {!showDeleteActions && !showEditActions && !showToggleActions && (
             <button
-              onClick={handleEdit}
-              className="p-2 rounded-lg bg-green-100 text-green-700 hover:bg-green-200 transition-colors"
-              title="Edit"
-            >
-              <PencilIcon className="h-4 w-4" />
-            </button>
+                onClick={() => setConfirmAction("delete")}
+                className="p-2 rounded-lg bg-pink-100 text-pink-700 hover:bg-pink-200 transition-colors"
+                title="Delete"
+              >
+                <TrashIcon className="h-4 w-4" />
+              </button>
           )}
-          {showDeleteActions && (
-            <button
-              onClick={() => onDelete(task.id)}
-              className="p-2 rounded-lg bg-pink-100 text-pink-700 hover:bg-pink-200 transition-colors"
-              title="Delete"
-            >
-              <TrashIcon className="h-4 w-4" />
-            </button>
-          )}
-          {!showDeleteActions && !showEditActions && !showToggleActions && (
-            <span className="px-3 py-1 bg-red-100 text-pink-700 text-sm rounded-full">
-              Deleted
-            </span>
-          )}
-        </div>
-      </td>
+          </div>
+        </td>
       {isEditing && (
         <EditTaskModal
           taskTitle={task.title}
@@ -147,6 +160,13 @@ export default function TaskItem({
             onUpdate(task.id, newTitle, newDescription)
           }
           onClose={() => setIsEditing(false)}
+        />
+      )}
+      {confirmAction && (
+        <ConfirmModal
+          message={`Are you sure you want to ${confirmAction} this task?`}
+          onConfirm={handleConfirm}
+          onCancel={handleCancel}
         />
       )}
     </tr>

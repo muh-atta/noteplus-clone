@@ -78,18 +78,37 @@ export async function GET(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   const { id, userId } = await req.json();
-  if (!id || !userId)
-    return NextResponse.json({ error: "Missing data" }, { status: 400 });
+
+  if (!id || !userId) {
+    return NextResponse.json({ error: "Missing task ID or User ID" }, { status: 400 });
+  }
 
   const task = await prisma.task.findUnique({ where: { id } });
-  if (!task || task.userId !== userId)
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  const updated = await prisma.task.update({
-    where: { id },
-    data: { status: true },
-  });
 
-  return NextResponse.json(updated);
+  if (!task || task.userId !== userId) {
+    return NextResponse.json({ error: "Forbidden or Task not found" }, { status: 403 });
+  }
+
+  if (task.status === true) {
+    try {
+      await prisma.task.delete({ where: { id } });
+      return NextResponse.json({ message: "Task permanently deleted." });
+    } catch (error) {
+      console.error("Permanent deletion failed:", error);
+      return NextResponse.json({ error: "Failed to permanently delete task." }, { status: 500 });
+    }
+  } else {
+    try {
+      const updatedTask = await prisma.task.update({
+        where: { id },
+        data: { status: true },
+      });
+      return NextResponse.json({ message: "Task status updated (soft-deleted).", task: updatedTask });
+    } catch (error) {
+      console.error("Status update failed:", error);
+      return NextResponse.json({ error: "Failed to update task status." }, { status: 500 });
+    }
+  }
 }
 
 export async function PUT(req: NextRequest) {

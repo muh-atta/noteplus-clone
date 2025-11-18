@@ -36,7 +36,7 @@ export default function TasksClient() {
   }, [page, searchQuery]);
 
   return (
-    <div className=" flex flex-col bg-gray-100 p-4 gap-12">
+    <div className=" flex flex-col bg-gray-100 p-4 gap-5">
       <div className="flex-1 bg-gray-50 flex flex-col">
         <Table
           data={tasks.filter((t) => t.status === true)}
