@@ -1,29 +1,42 @@
 "use client";
 import SkeletonRow from "./Skeleton";
+
+const columns = [
+  { key: "title", label: "Title", sortable: true },
+  { key: "description", label: "Description", sortable: true },
+  { key: "createdBy", label: "Created By" },
+  { key: "updated", label: "Updated" },
+  { key: "action", label: "Action" },
+];
+
 export default function Table({
-  columns,
   data,
   loading,
   sortConfig,
   onSort,
   renderRow,
+  page,
 }: {
-  columns: {
-    key: string;
-    label: string;
-    sortable?: boolean;
-    className?: string;
-  }[];
   data: any[];
   loading: boolean;
   sortConfig?: { key: string; direction: "asc" | "desc" } | null;
-  onSort?: (key: string) => void | undefined | undefined;
+  onSort?: (key: string) => void;
   skeletonCount?: number;
   renderRow: (row: any) => React.ReactNode;
+  page: number;
 }) {
+  const getSortIcon = (colKey: string) => {
+    if (!sortConfig || sortConfig.key !== colKey) return "";
+    return sortConfig.direction === "asc" ? "↑" : "↓";
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-md flex flex-col">
-      <div className="overflow-auto h-[calc(100vh-300px)]">
+      <div
+        className={`overflow-auto custom-scroll-hide ${
+          page > 1 ? "h-[calc(100vh-300px)]" : "h-[calc(100vh-200px)]"
+        }`}
+      >
         <table className="w-full rounded-xl table-fixed">
           <thead className="bg-gray-800 text-white">
             <tr>
@@ -31,20 +44,18 @@ export default function Table({
                 <th
                   key={col.key}
                   className={`
-            px-4 py-3 text-center 
-            w-auto
-            ${col.className || ""}
-            ${index === 0 ? "rounded-l-2xl" : ""} 
-            ${index === columns.length - 1 ? "rounded-r-2xl" : ""}
-          `}
+                    px-4 py-3 text-center cursor-pointer select-none
+                    ${index === 0 ? "rounded-l-2xl" : ""} 
+                    ${index === columns.length - 1 ? "rounded-r-2xl" : ""}
+                  `}
                   onClick={() => col.sortable && onSort?.(col.key)}
                 >
-                  {col.label}
-                  {col.sortable && sortConfig?.key === col.key
-                    ? sortConfig.direction === "asc"
-                      ? " ↑"
-                      : " ↓"
-                    : ""}
+                  <div className="flex justify-center items-center gap-1">
+                    <span>{col.label}</span>
+                    {col.sortable && (
+                      <span className="text-sm">{getSortIcon(col.key)}</span>
+                    )}
+                  </div>
                 </th>
               ))}
             </tr>

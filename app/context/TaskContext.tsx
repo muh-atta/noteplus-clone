@@ -5,6 +5,8 @@ import {
   useState,
   ReactNode,
   useCallback,
+  Dispatch,
+  SetStateAction,
 } from "react";
 import { Task } from "../types/task";
 import { toast } from "react-toastify";
@@ -15,7 +17,9 @@ interface TaskContextType {
   tasks: Task[];
   loading: boolean;
   totalPages: number;
-
+  page: number;
+  sortConfig: { key: string; direction: "asc" | "desc"; };
+  setPage: Dispatch<SetStateAction<number>>;
   fetchTasks: (page: number, query?: string, type?: string) => Promise<void>;
   addTask: (title: string, description: string, plan: string) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
@@ -39,20 +43,26 @@ export const TaskProvider = ({
   const { data: session, status } = useSession();
   let userId = session?.user?.id ?? null;
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [loading, setLoading] = useState(false);
   const [totalPages, setTotalPages] = useState(1);
-  const [sortConfig, setSortConfig] = useState<any>(null);
+  const [sortConfig, setSortConfig] = useState<any>({ key: 'title', direction: "asc"});
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(true);
 
   const fetchTasks = useCallback(
     async (page: number, query = "", type?: string) => {
+      console.log("called")
+      setTasks([])
+      setLoading(true);
+
       if (!userId) {
         const id = localStorage.getItem("userId");
         if (!id) {
+                setLoading(false);
+
           return;
         }
         userId = id;
       }
-      setLoading(true);
       console.log("type....", type);
       const res = await fetch(
         `/api/tasks?page=${page}&limit=${pageSize}&q=${query}&userId=${userId}&filter=${
@@ -206,6 +216,9 @@ export const TaskProvider = ({
         updateTask,
         toggleTask,
         handleSort,
+        page,
+        setPage,
+        sortConfig,
       }}
     >
       {children}

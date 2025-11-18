@@ -93,7 +93,7 @@ export default function Sidebar({
 
       <hr className="border-gray-300 mx-3" />
 
-      <div className="overflow-y-auto flex flex-col justify-between h-screen relative">
+      <div className="overflow-y-auto custom-scroll-hide  flex flex-col justify-between h-screen relative">
         <div>
           <button
             className={`flex items-center w-full mb-8 px-4 py-2.5 
@@ -270,7 +270,7 @@ export default function Sidebar({
             isCollapsed ? "opacity-0 h-0 overflow-hidden" : "opacity-100"
           }`}
         >
-          <div className="relative w-full h-[250px] overflow-hidden">
+          <div className="relative w-full h-[210px] overflow-hidden">
             <Image
               src={SideBkg}
               alt="Upgrade"

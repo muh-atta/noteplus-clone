@@ -6,16 +6,8 @@ import AddTaskModal from "../component/AddTaskModel";
 import { useRouter } from "next/navigation";
 import Table from "../component/Table";
 import { useTasks } from "../context/TaskContext";
-type SortKey = "title" | "description" | "updated";
-type SortDirection = "asc" | "desc";
-
-export default function TasksClient() {
-  const [page, setPage] = useState(1);
-  const [sortConfig, setSortConfig] = useState<{
-    key: SortKey;
-    direction: SortDirection;
-  } | null>(null);
-  const pageSize = 10;
+import Pagination from "../component/Pagination";
+export default function TasksClient() {  
   const [userId, setUserId] = useState<string | null>(null);
   const { searchQuery, openAddModal, setOpenAddModal } = useUI();
   const [title, setTitle] = useState("");
@@ -31,6 +23,8 @@ export default function TasksClient() {
     updateTask,
     toggleTask,
     handleSort,
+    sortConfig,
+    page
   } = useTasks();
 
   const router = useRouter();
@@ -56,17 +50,11 @@ export default function TasksClient() {
     <div className=" flex flex-col bg-gray-100 p-4 gap-12">
       <div className="flex-1 bg-gray-50 flex flex-col">
         <Table
-          columns={[
-            { key: "title", label: "Title", sortable: true },
-            { key: "description", label: "Description", sortable: true },
-            { key: "createdBy", label: "Created By" },
-            { key: "updated", label: "Updated", sortable: true },
-            { key: "action", label: "Action" },
-          ]}
           data={tasks}
           loading={loading}
           sortConfig={sortConfig}
           onSort={handleSort}
+          page={totalPages}
           renderRow={(task) => (
             <TaskItem
               key={task.id}
@@ -82,27 +70,11 @@ export default function TasksClient() {
         />
       </div>
 
-      <div className="flex justify-center items-center gap-4">
-        <button
-          className="px-4 py-2 rounded-full bg-white hover:bg-gray-100 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed border border-gray-300"
-          disabled={page === 1}
-          onClick={() => setPage(page - 1)}
-        >
-          ← Previous
-        </button>
-
-        <span className="px-4 py-2 text-md font-semibold bg-gray-800 text-white rounded-full shadow">
-          Page {page} / {totalPages}
-        </span>
-
-        <button
-          className="px-4 py-2 rounded-full bg-white hover:bg-gray-100 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed border border-gray-300"
-          disabled={page === totalPages}
-          onClick={() => setPage(page + 1)}
-        >
-          Next →
-        </button>
-      </div>
+      <>
+          {totalPages > 1 && (
+            <Pagination/>
+          )}
+          </>
 
       {openAddModal && (
         <AddTaskModal
