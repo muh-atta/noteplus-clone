@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { PencilSquareIcon } from "@heroicons/react/24/solid";
+import { PencilSquareIcon, ArrowPathIcon } from "@heroicons/react/24/solid";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -12,42 +12,14 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleSubmit = async (e: { preventDefault: () => void }) => {
-    e.preventDefault();
-    setError("");
-
-    if (!email || !password) {
-      setError("Please enter both email and password.");
-      return;
-    }
-
-    if (!/\S+@\S+\.\S+/.test(email)) {
-      setError("Please enter a valid email address.");
-      return;
-    }
-
+  const handleSignIn = async () => {
     setLoading(true);
-
     try {
-      const res = await fetch("/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || "Login failed.");
-        setLoading(false);
-        return;
-      }
-      router.push("/tasks");
+      await signIn("google", { callbackUrl: "/" });
     } catch (err) {
-      setError("Something went wrong. Please try again.");
+      console.error(err);
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
@@ -152,25 +124,19 @@ export default function LoginPage() {
 
         {/* Optional Google Sign-In */}
         <button
-          onClick={async () => {
-            setLoading(true);
-            await signIn("google", { callbackUrl: "/" });
-          }}
-          className="w-64 mx-auto block bg-gray-800 text-white rounded-xl mb-10 py-2 px-4 shadow-md transition duration-200 hover:bg-gray-600 flex justify-center items-center text-lg font-medium"
-        >
-          {loading ? "Signing In..." : "Sign In with Google"}
-        </button>
-
-        {/* Signup Link */}
-        {/* <p className="text-center mt-6 text-gray-500 text-sm">
-          Don’t have an account?
-          <Link
-            href="/signup"
-            className="ml-1 text-gray-900 hover:underline font-medium"
-          >
-            Sign Up
-          </Link>
-        </p> */}
+      onClick={handleSignIn}
+      className="w-64 mx-auto block bg-gray-800 text-white rounded-xl mb-10 py-2 px-4 shadow-md transition duration-200 hover:bg-gray-600 flex justify-center items-center text-lg font-medium"
+      disabled={loading}
+    >
+      {loading ? (
+        <>
+          <ArrowPathIcon className="w-5 h-5 mr-2 animate-spin" />
+          Signing In...
+        </>
+      ) : (
+        "Sign In with Google"
+      )}
+    </button>
       </div>
     </div>
   );

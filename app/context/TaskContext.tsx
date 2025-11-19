@@ -58,7 +58,7 @@ export const TaskProvider = ({
         const id = localStorage.getItem("userId");
         if (!id) {
                 setLoading(false);
-
+        window.location.href  = "/login"
           return;
         }
         userId = id;

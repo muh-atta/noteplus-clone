@@ -2,7 +2,7 @@
 import { useSession } from "next-auth/react";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, ReactNode } from "react";
-
+import Loader from "./Loader";
 const PUBLIC_ROUTES = ["/login", "/signup", "/forgot-password"];
 const PROTECTED_ROUTE_AFTER_LOGIN = "/tasks";
 interface AuthWrapperProps {
@@ -31,7 +31,7 @@ export default function AuthWrapper({ children }: AuthWrapperProps) {
   if (status === "loading" && isPublicRoute) {
     return (
       <div className="flex items-center justify-center h-screen text-gray-500">
-        Loading...
+        <Loader/>
       </div>
     );
   }

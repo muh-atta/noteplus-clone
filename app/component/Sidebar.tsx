@@ -250,21 +250,26 @@ export default function Sidebar({
             </button>
 
             <button
-              onClick={() => {
-                localStorage.removeItem("userSession");
-                localStorage.removeItem("userId");
-                signOut({ callbackUrl: "/login" });
-              }}
-              className={`text-gray-800 p-2.5 rounded-lg hover:bg-gray-100 transition flex items-center cursor-pointer 
-              ${isCollapsed ? "justify-center" : "space-x-3 px-4"}`}
-            >
-              <LogOut className="w-5 h-5 shrink-0" />
-              <span
-                className={`text-gray-600 font-medium ${textVisibilityClass}`}
-              >
-                Logout
-              </span>
-            </button>
+  onClick={async () => {
+    try {
+      localStorage.removeItem("userSession");
+      localStorage.removeItem("userId");
+      await signOut({ redirect: false });
+      setTimeout(() => {
+        window.location.href = "/login";
+      }, 500);
+
+    } catch (err) {
+      console.error("Error during logout:", err);
+    }
+  }}
+  className={`text-gray-800 p-2.5 rounded-lg hover:bg-gray-100 transition flex items-center cursor-pointer 
+  ${isCollapsed ? "justify-center" : "space-x-3 px-4"}`}
+>
+  <LogOut className="w-5 h-5 shrink-0" />
+  <span className={`text-gray-600 font-medium ${textVisibilityClass}`}>Logout</span>
+</button>
+
           </nav>
         </div>
         <div

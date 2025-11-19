@@ -11,13 +11,13 @@ export default function Page() {
   useEffect(() => {
     if (status === "loading") return;
 
-    if (session?.user) {
+    if (session?.user?.id) {
       localStorage.setItem("userSession", JSON.stringify(session));
-      if (session.user.id) {
-        localStorage.setItem("userId", session.user.id);
-      }
+      localStorage.setItem("userId", session.user.id);
       router.push("/tasks");
     } else {
+      localStorage.removeItem("userSession");
+      localStorage.removeItem("userId");
       router.push("/login");
     }
   }, [session, status, router]);
