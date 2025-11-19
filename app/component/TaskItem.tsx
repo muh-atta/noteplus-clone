@@ -59,7 +59,7 @@ export default function TaskItem({
   console.log("showToggleActions", showDeleteActions)
   return (
     <tr className="hover:bg-gray-50 transition-colors align-top">
-      <td className="px-4 py-8 text-center text-sm font-medium text-gray-900 truncate max-w-xs">
+      <td className="px-4 py-8 text-center text-sm font-medium text-gray-900 truncate w-full font-sans text-base leading-relaxed">
         <Popover className="relative">
           <Popover.Button className="truncate w-full cursor-pointer">
             {task.title}
@@ -74,37 +74,53 @@ export default function TaskItem({
             leaveFrom="opacity-100 translate-y-0"
             leaveTo="opacity-0 translate-y-1"
           >
-            <Popover.Panel className="absolute z-10 bg-white border border-gray-200 shadow-xl p-4 rounded-md left-0">
+            <Popover.Panel className="absolute z-10 bg-white border border-gray-200 shadow-xl 
+    p-4 rounded-md 
+    left-0
+    whitespace-normal text-left
+    w-full
+    columns-text">
               {task.title}
             </Popover.Panel>
           </Transition>
         </Popover>
       </td>
-      <td className="px-4 py-8 text-center text-sm font-medium text-gray-900 truncate max-w-xs">
-        <Popover className="relative">
-          <Popover.Button className="truncate w-full text-center cursor-pointer">
-            {task.description || "No description provided"}
-          </Popover.Button>
+      <td className="px-4 py-8 text-center text-sm font-medium text-gray-900 font-sans text-base leading-relaxed">
+  <Popover className="relative">
+    <Popover.Button className="w-full cursor-pointer line-clamp-2 text-center">
+      {task.description || "No description provided"}
+    </Popover.Button>
 
-          <Transition
-            as={Fragment}
-            enter="transition ease-out duration-200"
-            enterFrom="opacity-0 translate-y-1"
-            enterTo="opacity-100 translate-y-0"
-            leave="transition ease-in duration-150"
-            leaveFrom="opacity-100 translate-y-0"
-            leaveTo="opacity-0 translate-y-1"
-          >
-            <Popover.Panel className="absolute z-10 bg-white border border-gray-200 shadow-xl p-4 rounded-md max-w-xl left-0">
-              {task.description}
-            </Popover.Panel>
-          </Transition>
-        </Popover>
-      </td>
-      <td className="px-8 text-center py-8  whitespace-nowrap text-sm font-medium text-gray-900">
+    <Transition
+      as={Fragment}
+      enter="transition ease-out duration-200"
+      enterFrom="opacity-0 translate-y-1"
+      enterTo="opacity-100 translate-y-0"
+      leave="transition ease-in duration-150"
+      leaveFrom="opacity-100 translate-y-0"
+      leaveTo="opacity-0 translate-y-1"
+    >
+      <Popover.Panel
+  className="
+    absolute z-10 bg-white border border-gray-200 shadow-xl 
+    p-4 rounded-md 
+    left-0
+    whitespace-normal text-left
+    w-full
+    columns-text
+  "
+>
+  {task.description}
+</Popover.Panel>
+
+    </Transition>
+  </Popover>
+</td>
+
+      <td className="px-8 text-center py-8  whitespace-nowrap text-sm font-medium text-gray-900 font-sans text-base leading-relaxed">
         {createdBy}
       </td>
-      <td className="px-8 text-center py-8  whitespace-nowrap text-sm font-medium text-gray-900">
+      <td className="px-8 text-center py-8  whitespace-nowrap text-sm font-medium text-gray-900 font-sans text-base leading-relaxed">
         {updatedAt}
       </td>
        <td className="px-8 py-8 whitespace-nowrap text-sm font-medium text-center">

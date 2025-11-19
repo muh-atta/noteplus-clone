@@ -49,3 +49,8 @@ body {
 .custom-scroll-hide:hover::-webkit-scrollbar-thumb {
   background-color: rgba(107, 114, 128, 0.5); /* Gray color when hovered */
 }
+
+.columns-text {
+  column-count: 1;       
+  overflow-y: auto;  
+}
